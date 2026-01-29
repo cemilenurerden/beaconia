@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnergyLevel {
+  low
+  medium
+  high
+}
+
+enum Location {
+  home
+  outdoor
+  any
+}
+
+enum Cost {
+  free
+  low
+  medium
+}
+
+enum Social {
+  solo
+  friends
+  both
+}
+
+enum Feedback {
+  up
+  down
+  retry
+}
+
+model Activity {
+  id          String      @id @default(uuid())
+  title       String
+  category    String
+  tags        String[]
+  durationMin Int
+  durationMax Int
+  energyLevel EnergyLevel
+  moodTags    String[]
+  location    Location
+  cost        Cost
+  social      Social
+  steps       Json
+  safetyNotes String?
+  url         String?
+  createdAt   DateTime    @default(now())
+
+  selectedDecisions DecisionHistory[] @relation("SelectedActivity")
+  planBDecisions    DecisionHistory[] @relation("PlanBActivity")
+  favorites         Favorite[]
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  passwordHash String
+  city         String?
+  createdAt    DateTime          @default(now())
+  decisions    DecisionHistory[]
+  favorites    Favorite[]
+}
+
+model DecisionHistory {
+  id                 String    @id @default(uuid())
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inputJson          Json
+  selectedActivityId String
+  selectedActivity   Activity  @relation("SelectedActivity", fields: [selectedActivityId], references: [id])
+  planBActivityId    String?
+  planBActivity      Activity? @relation("PlanBActivity", fields: [planBActivityId], references: [id])
+  reason             String
+  firstStep          String
+  feedback           Feedback?
+  feedbackReason     String?
+  createdAt          DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String
+  activityId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, activityId])
+  @@index([userId])
+}
