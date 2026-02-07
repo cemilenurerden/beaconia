@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F0' }}>
       {/* Header: Skip button */}
       <View className="flex-row items-center justify-end px-6 py-2">
         {!isLastPage && (
@@ -83,8 +83,10 @@ export default function OnboardingScreen() {
       />
 
       {/* Footer: Dots + Button */}
-      <View className="items-center gap-6 px-6 pb-8">
+      <View className="items-center px-6 pb-8 pt-4 -mt-8">
         <DotIndicator total={onboardingPages.length} activeIndex={activeIndex} />
+
+        <View className="mt-16 w-full">
 
         <Pressable
           onPress={handleNext}
@@ -95,12 +97,7 @@ export default function OnboardingScreen() {
             {onboardingPages[activeIndex].buttonText}
           </Text>
         </Pressable>
-
-        {isLastPage && (
-          <Text className="text-xs font-medium uppercase tracking-wider text-gray-400">
-            Premium Karar Deneyimi
-          </Text>
-        )}
+        </View>
       </View>
     </SafeAreaView>
   );
