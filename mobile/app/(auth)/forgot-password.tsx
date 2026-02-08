@@ -5,29 +5,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthHeader } from '../../src/components/auth/AuthHeader';
 import { AuthInput } from '../../src/components/auth/AuthInput';
-import { useAuthStore } from '../../src/store/auth';
 import { api, ApiError } from '../../src/api/client';
-import type { AuthResult } from '../../src/types';
 
-export default function LoginScreen() {
+export default function ForgotPasswordScreen() {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const canSubmit = email.trim() && password.trim();
+  const canSubmit = email.trim();
 
-  const handleLogin = async () => {
+  const handleSendCode = async () => {
     if (!canSubmit) return;
     setError('');
     setLoading(true);
     try {
-      const result = await api.post<AuthResult>('/auth/login', { email, password });
-      login(result.accessToken, result.user);
-      router.replace('/(tabs)');
+      await api.post('/auth/forgot-password', { email });
+      router.push(`/(auth)/verify-reset-code?email=${encodeURIComponent(email)}`);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Bir hata oluştu. Tekrar deneyin.');
     } finally {
@@ -37,17 +32,15 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Sol ve sağ mavi border efekti */}
       <View className="absolute left-0 top-0 bottom-0 w-1 bg-blue-200" />
       <View className="absolute right-0 top-0 bottom-0 w-1 bg-blue-200" />
 
-      {/* Header */}
       <View className="flex-row items-center px-5 py-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="chevron-back" size={24} color="#111827" />
         </Pressable>
         <Text className="flex-1 text-center text-base font-semibold text-gray-900 mr-6">
-          Giriş Yap
+          Şifremi Unuttum
         </Text>
       </View>
 
@@ -55,7 +48,10 @@ export default function LoginScreen() {
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 16 }}
         keyboardShouldPersistTaps="handled"
       >
-        <AuthHeader title="Hoş Geldiniz" subtitle="Devam etmek için giriş yapın." />
+        <AuthHeader
+          title="Şifre Sıfırlama"
+          subtitle="Email adresinize bir doğrulama kodu göndereceğiz."
+        />
 
         {error !== '' && (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
@@ -71,56 +67,24 @@ export default function LoginScreen() {
           onChangeText={setEmail}
         />
 
-        <AuthInput
-          label="Şifre"
-          placeholder="Şifrenizi girin"
-          isPassword
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <Pressable className="self-end mb-6" onPress={() => router.push('/(auth)/forgot-password')}>
-          <Text className="text-sm text-gray-400">Şifremi Unuttum</Text>
-        </Pressable>
-
-        {/* Giriş Yap butonu */}
         <Pressable
-          onPress={handleLogin}
+          onPress={handleSendCode}
           disabled={!canSubmit || loading}
-          className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mb-6"
+          className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mt-4 mb-6"
         >
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
             <>
-              <Text className="text-base font-semibold text-white mr-2">Giriş Yap</Text>
+              <Text className="text-base font-semibold text-white mr-2">Kod Gönder</Text>
               <Ionicons name="arrow-forward" size={18} color="white" />
             </>
           )}
         </Pressable>
 
-        {/* VEYA ayırıcı */}
-        <View className="flex-row items-center mb-6">
-          <View className="flex-1 h-px bg-gray-200" />
-          <Text className="mx-4 text-xs text-gray-400">VEYA</Text>
-          <View className="flex-1 h-px bg-gray-200" />
-        </View>
-
-        {/* Sosyal giriş butonları */}
-        <View className="flex-row justify-center gap-4 mb-8">
-          <Pressable className="w-12 h-12 rounded-xl bg-gray-900 items-center justify-center">
-            <Ionicons name="logo-apple" size={24} color="white" />
-          </Pressable>
-          <Pressable className="w-12 h-12 rounded-xl bg-gray-100 items-center justify-center">
-            <Ionicons name="logo-google" size={24} color="#4285F4" />
-          </Pressable>
-        </View>
-
-        {/* Kayıt ol linki */}
         <View className="flex-row justify-center mt-auto pb-6">
-          <Text className="text-sm text-gray-400">Henüz hesabın yok mu? </Text>
-          <Pressable onPress={() => router.push('/(auth)/register')}>
-            <Text className="text-sm font-semibold text-blue-500">Kayıt Ol</Text>
+          <Pressable onPress={() => router.back()}>
+            <Text className="text-sm font-semibold text-blue-500">Giriş Ekranına Dön</Text>
           </Pressable>
         </View>
       </ScrollView>

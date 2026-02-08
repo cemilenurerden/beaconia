@@ -60,14 +60,27 @@ model Activity {
 }
 
 model User {
-  id           String            @id @default(uuid())
-  name         String
-  email        String            @unique
-  passwordHash String
-  city         String?
-  createdAt    DateTime          @default(now())
-  decisions    DecisionHistory[]
-  favorites    Favorite[]
+  id             String            @id @default(uuid())
+  name           String
+  email          String            @unique
+  passwordHash   String
+  city           String?
+  createdAt      DateTime          @default(now())
+  decisions      DecisionHistory[]
+  favorites      Favorite[]
+  passwordResets PasswordReset[]
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model DecisionHistory {
