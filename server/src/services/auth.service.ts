@@ -8,6 +8,7 @@ export interface AuthResult {
   accessToken: string;
   user: {
     id: string;
+    name: string;
     email: string;
     city: string | null;
     createdAt: Date;
@@ -30,6 +31,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
   // Create user
   const user = await prisma.user.create({
     data: {
+      name: input.name,
       email: input.email,
       passwordHash,
       city: input.city,
@@ -43,6 +45,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
     accessToken,
     user: {
       id: user.id,
+      name: user.name,
       email: user.email,
       city: user.city,
       createdAt: user.createdAt,
@@ -74,6 +77,7 @@ export async function login(input: LoginInput): Promise<AuthResult> {
     accessToken,
     user: {
       id: user.id,
+      name: user.name,
       email: user.email,
       city: user.city,
       createdAt: user.createdAt,

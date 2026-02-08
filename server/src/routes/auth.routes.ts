@@ -17,8 +17,11 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email, password]
+ *             required: [name, email, password]
  *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
  *               email:
  *                 type: string
  *                 format: email
