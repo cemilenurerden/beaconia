@@ -1,6 +1,7 @@
 // ---- User ----
 export interface User {
   id: string;
+  name: string;
   email: string;
   city: string | null;
   createdAt: string;

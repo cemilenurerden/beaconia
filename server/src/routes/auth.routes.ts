@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
-import { registerSchema, loginSchema } from '../validators/auth.validator.js';
+import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema } from '../validators/auth.validator.js';
 
 const router = Router();
 
@@ -17,8 +17,11 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email, password]
+ *             required: [name, email, password]
  *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
  *               email:
  *                 type: string
  *                 format: email
@@ -61,5 +64,9 @@ router.post('/register', validateBody(registerSchema), authController.register);
  *         description: Invalid credentials
  */
 router.post('/login', validateBody(loginSchema), authController.login);
+
+router.post('/forgot-password', validateBody(forgotPasswordSchema), authController.forgotPassword);
+router.post('/verify-reset-code', validateBody(verifyResetCodeSchema), authController.verifyResetCode);
+router.post('/reset-password', validateBody(resetPasswordSchema), authController.resetPassword);
 
 export default router;

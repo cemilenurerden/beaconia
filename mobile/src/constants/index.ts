@@ -1,8 +1,13 @@
 import { Platform } from 'react-native';
 
-// Android emülatörde localhost yerine 10.0.2.2 kullanılır
-const LOCALHOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+// Fiziksel cihaz: bilgisayarın Wi-Fi IP adresi
+// Android emülatör: 10.0.2.2, iOS simülatör: localhost
+const DEV_HOST = Platform.select({
+  android: '172.20.10.3',
+  ios: '172.20.10.3',
+  default: 'localhost',
+});
 
 export const API_URL = __DEV__
-  ? `http://${LOCALHOST}:3000`
+  ? `http://${DEV_HOST}:3001`
   : 'https://api.beaconia.com';
