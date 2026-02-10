@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,8 @@ import { AuthHeader } from '../../src/components/auth/AuthHeader';
 import { AuthInput } from '../../src/components/auth/AuthInput';
 import { useAuthStore } from '../../src/store/auth';
 import { api, ApiError } from '../../src/api/client';
+import { useFormValidation } from '../../src/hooks/useFormValidation';
+import { required, email as emailRule, minLength, maxLength } from '../../src/utils/validation';
 import type { AuthResult } from '../../src/types';
 
 export default function LoginScreen() {
@@ -18,10 +20,18 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const canSubmit = email.trim() && password.trim();
+  const schema = useMemo(
+    () => ({
+      email: [required, emailRule, maxLength(254)],
+      password: [required, minLength(6), maxLength(128)],
+    }),
+    [],
+  );
+
+  const { errors, validateForm, clearFieldError } = useFormValidation(schema);
 
   const handleLogin = async () => {
-    if (!canSubmit) return;
+    if (!validateForm({ email, password })) return;
     setError('');
     setLoading(true);
     try {
@@ -68,7 +78,11 @@ export default function LoginScreen() {
           placeholder="E-posta adresinizi girin"
           keyboardType="email-address"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(v) => {
+            setEmail(v);
+            clearFieldError('email');
+          }}
+          error={errors.email}
         />
 
         <AuthInput
@@ -76,7 +90,11 @@ export default function LoginScreen() {
           placeholder="Şifrenizi girin"
           isPassword
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+            clearFieldError('password');
+          }}
+          error={errors.password}
         />
 
         <Pressable className="self-end mb-6" onPress={() => router.push('/(auth)/forgot-password')}>
@@ -86,7 +104,7 @@ export default function LoginScreen() {
         {/* Giriş Yap butonu */}
         <Pressable
           onPress={handleLogin}
-          disabled={!canSubmit || loading}
+          disabled={loading}
           className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mb-6"
         >
           {loading ? (

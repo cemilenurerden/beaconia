@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { AuthHeader } from '../../src/components/auth/AuthHeader';
 import { AuthInput } from '../../src/components/auth/AuthInput';
 import { api, ApiError } from '../../src/api/client';
+import { useFormValidation } from '../../src/hooks/useFormValidation';
+import { required, email as emailRule } from '../../src/utils/validation';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -14,10 +16,12 @@ export default function ForgotPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const canSubmit = email.trim();
+  const schema = useMemo(() => ({ email: [required, emailRule] }), []);
+
+  const { errors, validateForm, clearFieldError } = useFormValidation(schema);
 
   const handleSendCode = async () => {
-    if (!canSubmit) return;
+    if (!validateForm({ email })) return;
     setError('');
     setLoading(true);
     try {
@@ -64,12 +68,16 @@ export default function ForgotPasswordScreen() {
           placeholder="E-posta adresinizi girin"
           keyboardType="email-address"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(v) => {
+            setEmail(v);
+            clearFieldError('email');
+          }}
+          error={errors.email}
         />
 
         <Pressable
           onPress={handleSendCode}
-          disabled={!canSubmit || loading}
+          disabled={loading}
           className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mt-4 mb-6"
         >
           {loading ? (
