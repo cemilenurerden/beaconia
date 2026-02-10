@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { AuthHeader } from '../../src/components/auth/AuthHeader';
 import { AuthInput } from '../../src/components/auth/AuthInput';
 import { api, ApiError } from '../../src/api/client';
+import { useFormValidation } from '../../src/hooks/useFormValidation';
+import { required, minLength, match } from '../../src/utils/validation';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
@@ -16,16 +18,19 @@ export default function ResetPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const canSubmit = newPassword.length >= 6 && newPassword === confirmPassword;
+  // match kuralı dinamik olarak newPassword'ün güncel değerini alır
+  const schema = useMemo(
+    () => ({
+      newPassword: [required, minLength(6)],
+      confirmPassword: [required, match(() => newPassword)],
+    }),
+    [newPassword],
+  );
+
+  const { errors, validateForm, clearFieldError } = useFormValidation(schema);
 
   const handleReset = async () => {
-    if (!canSubmit) return;
-
-    if (newPassword !== confirmPassword) {
-      setError('Şifreler eşleşmiyor');
-      return;
-    }
-
+    if (!validateForm({ newPassword, confirmPassword })) return;
     setError('');
     setLoading(true);
     try {
@@ -72,7 +77,11 @@ export default function ResetPasswordScreen() {
           placeholder="En az 6 karakter"
           isPassword
           value={newPassword}
-          onChangeText={setNewPassword}
+          onChangeText={(v) => {
+            setNewPassword(v);
+            clearFieldError('newPassword');
+          }}
+          error={errors.newPassword}
         />
 
         <AuthInput
@@ -80,12 +89,16 @@ export default function ResetPasswordScreen() {
           placeholder="Şifrenizi tekrar girin"
           isPassword
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(v) => {
+            setConfirmPassword(v);
+            clearFieldError('confirmPassword');
+          }}
+          error={errors.confirmPassword}
         />
 
         <Pressable
           onPress={handleReset}
-          disabled={!canSubmit || loading}
+          disabled={loading}
           className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mt-4 mb-6"
         >
           {loading ? (

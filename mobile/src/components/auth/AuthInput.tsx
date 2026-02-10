@@ -5,15 +5,20 @@ import { Ionicons } from '@expo/vector-icons';
 interface AuthInputProps extends TextInputProps {
   label: string;
   isPassword?: boolean;
+  error?: string;
 }
 
-export function AuthInput({ label, isPassword, ...rest }: AuthInputProps) {
+export function AuthInput({ label, isPassword, error, ...rest }: AuthInputProps) {
   const [secure, setSecure] = useState(isPassword);
 
   return (
     <View className="mb-4">
       <Text className="text-sm font-medium text-gray-700 mb-2">{label}</Text>
-      <View className="flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3.5">
+      <View
+        className={`flex-row items-center rounded-xl border bg-white px-4 py-3.5 ${
+          error ? 'border-red-400' : 'border-gray-200'
+        }`}
+      >
         <TextInput
           className="flex-1 text-base text-gray-900"
           placeholderTextColor="#9CA3AF"
@@ -31,6 +36,7 @@ export function AuthInput({ label, isPassword, ...rest }: AuthInputProps) {
           </Pressable>
         )}
       </View>
+      {error && <Text className="text-xs text-red-500 mt-1 ml-1">{error}</Text>}
     </View>
   );
 }
