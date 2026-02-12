@@ -65,6 +65,7 @@ model User {
   email          String            @unique
   passwordHash   String
   city           String?
+  preferences    Json?
   createdAt      DateTime          @default(now())
   decisions      DecisionHistory[]
   favorites      Favorite[]

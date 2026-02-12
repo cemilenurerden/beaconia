@@ -5,6 +5,7 @@ import recommendRoutes from './recommend.routes.js';
 import favoritesRoutes from './favorites.routes.js';
 import historyRoutes from './history.routes.js';
 import feedbackRoutes from './feedback.routes.js';
+import userRoutes from './user.routes.js';
 import * as healthController from '../controllers/health.controller.js';
 
 const router = Router();
@@ -19,5 +20,6 @@ router.use('/recommend', recommendRoutes);
 router.use('/favorites', favoritesRoutes);
 router.use('/history', historyRoutes);
 router.use('/feedback', feedbackRoutes);
+router.use('/user', userRoutes);
 
 export default router;

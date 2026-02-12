@@ -1,13 +1,29 @@
+import { useState, useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth';
+import { getStats } from '../../src/api/user';
+import type { UserStats } from '../../src/types';
 
 export default function HomeScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const firstName = user?.name?.split(' ')[0] ?? 'Kullanıcı';
+
+  const [stats, setStats] = useState<UserStats>({
+    dailyCompleted: 0,
+    dailyGoal: 3,
+    streak: 0,
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      getStats().then(setStats).catch(() => {});
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -64,7 +80,9 @@ export default function HomeScreen() {
             <Ionicons name="flag" size={20} color="#22C55E" />
           </View>
           <Text className="text-sm text-gray-400 mb-1">Günlük Hedef</Text>
-          <Text className="text-xl font-bold text-gray-900">0/3</Text>
+          <Text className="text-xl font-bold text-gray-900">
+            {stats.dailyCompleted}/{stats.dailyGoal}
+          </Text>
           <Text className="text-xs text-gray-400">Tamamlandı</Text>
         </View>
 
@@ -73,7 +91,7 @@ export default function HomeScreen() {
             <Ionicons name="flame" size={20} color="#F97316" />
           </View>
           <Text className="text-sm text-gray-400 mb-1">Streak</Text>
-          <Text className="text-xl font-bold text-gray-900">0 Gün</Text>
+          <Text className="text-xl font-bold text-gray-900">{stats.streak} Gün</Text>
           <Text className="text-xs text-gray-400">Devam et!</Text>
         </View>
       </View>

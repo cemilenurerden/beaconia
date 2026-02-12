@@ -38,6 +38,22 @@ export interface Activity {
   createdAt: string;
 }
 
+// ---- User Stats & Preferences ----
+export interface UserStats {
+  dailyCompleted: number;
+  dailyGoal: number;
+  streak: number;
+}
+
+export interface UserPreferences {
+  duration: number;
+  energy: string;
+  location: string;
+  cost: string;
+  social: string;
+  mood?: string;
+}
+
 // ---- Recommend ----
 export interface RecommendInput {
   duration: number;
