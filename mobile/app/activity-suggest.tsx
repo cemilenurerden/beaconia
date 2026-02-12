@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, Switch } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, Switch, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
+import { getPreferences, updatePreferences } from '../src/api/user';
+import { getRecommendation } from '../src/api/recommend';
+import { formToApiInput, preferencesToForm } from '../src/utils/mappers';
 
 const ENERGY_OPTIONS = ['Düşük', 'Orta', 'Yüksek'] as const;
 
@@ -24,6 +27,42 @@ export default function ActivitySuggestScreen() {
   const [budget, setBudget] = useState<string>('EKONOMİK');
   const [isAlone, setIsAlone] = useState(false);
   const [mood, setMood] = useState<string>('🔥');
+  const [loading, setLoading] = useState(false);
+
+  // Sayfa açılışında önceki tercihleri yükle
+  useEffect(() => {
+    getPreferences().then((prefs) => {
+      if (!prefs) return;
+      const form = preferencesToForm(prefs);
+      setDuration(form.duration);
+      setEnergy(form.energy);
+      setIsHome(form.isHome);
+      setBudget(form.budget);
+      setIsAlone(form.isAlone);
+      setMood(form.mood);
+    }).catch(() => {});
+  }, []);
+
+  async function handleRecommend() {
+    setLoading(true);
+    try {
+      const input = formToApiInput({ duration, energy, isHome, budget, isAlone, mood });
+
+      const [result] = await Promise.all([
+        getRecommendation(input),
+        updatePreferences(input),
+      ]);
+
+      Alert.alert(
+        result.selected.title,
+        `${result.reason}\n\nİlk adım: ${result.firstStep}${result.planB ? `\n\nAlternatif: ${result.planB.title}` : ''}`,
+      );
+    } catch (error: any) {
+      Alert.alert('Hata', error.message || 'Öneri alınamadı. Lütfen tekrar dene.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -186,9 +225,21 @@ export default function ActivitySuggestScreen() {
 
       {/* Öneri Getir butonu */}
       <View className="absolute bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-gray-50">
-        <Pressable className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-5">
-          <Text className="text-lg font-bold text-white mr-2">Öneri Getir</Text>
-          <Text className="text-lg">🚀</Text>
+        <Pressable
+          onPress={handleRecommend}
+          disabled={loading}
+          className={`flex-row items-center justify-center rounded-2xl py-5 ${
+            loading ? 'bg-blue-300' : 'bg-blue-500'
+          }`}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Text className="text-lg font-bold text-white mr-2">Öneri Getir</Text>
+              <Text className="text-lg">🚀</Text>
+            </>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
