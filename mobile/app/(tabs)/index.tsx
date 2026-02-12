@@ -1,9 +1,11 @@
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const firstName = user?.name?.split(' ')[0] ?? 'Kullanıcı';
 
@@ -46,7 +48,7 @@ export default function HomeScreen() {
             Senin için seçtiğimiz günlük{'\n'}aktivitelerle potansiyelini{'\n'}keşfet.
           </Text>
 
-          <Pressable className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-5 px-8 w-full">
+          <Pressable onPress={() => router.push('/activity-suggest')} className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-5 px-8 w-full">
             <Text className="text-lg font-semibold text-white mr-2">
               Hadi Başlayalım
             </Text>
