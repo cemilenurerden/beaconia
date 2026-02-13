@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Pressable, ScrollView, Switch, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Switch, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -68,9 +68,9 @@ export default function ActivitySuggestScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* Geri butonu */}
-        <Pressable onPress={() => router.back()} className="mt-4 mb-2">
+        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 16, marginBottom: 8 }}>
           <Ionicons name="arrow-back" size={24} color="#111827" />
-        </Pressable>
+        </TouchableOpacity>
 
         {/* Başlık */}
         <Text className="text-3xl font-bold text-gray-900 mt-2">Şimdi Ne?</Text>
@@ -111,21 +111,35 @@ export default function ActivitySuggestScreen() {
           </Text>
           <View className="flex-row bg-gray-100 rounded-2xl p-1">
             {ENERGY_OPTIONS.map((opt) => (
-              <Pressable
+              <TouchableOpacity
                 key={opt}
                 onPress={() => setEnergy(opt)}
-                className={`flex-1 items-center py-3 rounded-xl ${
-                  energy === opt ? 'bg-white shadow-sm' : ''
-                }`}
+                activeOpacity={0.7}
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  paddingVertical: 12,
+                  borderRadius: 12,
+                  backgroundColor: energy === opt ? '#FFFFFF' : 'transparent',
+                  ...(energy === opt && {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 2,
+                    elevation: 2,
+                  }),
+                }}
               >
                 <Text
-                  className={`text-sm font-semibold ${
-                    energy === opt ? 'text-gray-900' : 'text-gray-400'
-                  }`}
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '600',
+                    color: energy === opt ? '#111827' : '#9CA3AF',
+                  }}
                 >
                   {opt}
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -153,32 +167,45 @@ export default function ActivitySuggestScreen() {
             BÜTÇEN NEDİR?
           </Text>
           <View className="flex-row gap-3">
-            {BUDGET_OPTIONS.map((opt) => (
-              <Pressable
-                key={opt.sub}
-                onPress={() => setBudget(opt.sub)}
-                className={`flex-1 items-center py-4 rounded-2xl border ${
-                  budget === opt.sub
-                    ? 'bg-blue-500 border-blue-500'
-                    : 'bg-white border-gray-200'
-                }`}
-              >
-                <Text
-                  className={`text-lg font-bold mb-1 ${
-                    budget === opt.sub ? 'text-white' : 'text-gray-900'
-                  }`}
+            {BUDGET_OPTIONS.map((opt) => {
+              const isSelected = budget === opt.sub;
+              return (
+                <TouchableOpacity
+                  key={opt.sub}
+                  onPress={() => setBudget(opt.sub)}
+                  activeOpacity={0.7}
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    paddingVertical: 16,
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    backgroundColor: isSelected ? '#3B82F6' : '#FFFFFF',
+                    borderColor: isSelected ? '#3B82F6' : '#E5E7EB',
+                  }}
                 >
-                  {opt.label}
-                </Text>
-                <Text
-                  className={`text-xs font-semibold ${
-                    budget === opt.sub ? 'text-blue-200' : 'text-gray-400'
-                  }`}
-                >
-                  {opt.sub}
-                </Text>
-              </Pressable>
-            ))}
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: '700',
+                      marginBottom: 4,
+                      color: isSelected ? '#FFFFFF' : '#111827',
+                    }}
+                  >
+                    {opt.label}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '600',
+                      color: isSelected ? '#BFDBFE' : '#9CA3AF',
+                    }}
+                  >
+                    {opt.sub}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -206,15 +233,23 @@ export default function ActivitySuggestScreen() {
           </Text>
           <View className="flex-row gap-3">
             {MOOD_OPTIONS.map((emoji) => (
-              <Pressable
+              <TouchableOpacity
                 key={emoji}
                 onPress={() => setMood(emoji)}
-                className={`w-14 h-14 rounded-2xl items-center justify-center ${
-                  mood === emoji ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-100'
-                }`}
+                activeOpacity={0.7}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: mood === emoji ? '#DBEAFE' : '#F3F4F6',
+                  borderWidth: mood === emoji ? 2 : 0,
+                  borderColor: mood === emoji ? '#60A5FA' : 'transparent',
+                }}
               >
-                <Text className="text-2xl">{emoji}</Text>
-              </Pressable>
+                <Text style={{ fontSize: 24 }}>{emoji}</Text>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -225,22 +260,30 @@ export default function ActivitySuggestScreen() {
 
       {/* Öneri Getir butonu */}
       <View className="absolute bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-gray-50">
-        <Pressable
+        <TouchableOpacity
           onPress={handleRecommend}
           disabled={loading}
-          className={`flex-row items-center justify-center rounded-2xl py-5 ${
-            loading ? 'bg-blue-300' : 'bg-blue-500'
-          }`}
+          activeOpacity={0.8}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 16,
+            paddingVertical: 20,
+            backgroundColor: loading ? '#93C5FD' : '#3B82F6',
+          }}
         >
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
             <>
-              <Text className="text-lg font-bold text-white mr-2">Öneri Getir</Text>
-              <Text className="text-lg">🚀</Text>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginRight: 8 }}>
+                Öneri Getir
+              </Text>
+              <Text style={{ fontSize: 18 }}>🚀</Text>
             </>
           )}
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

@@ -2,6 +2,7 @@ import { Activity, Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma.js';
 import { RecommendInput } from '../validators/recommend.validator.js';
 import { scoreActivity, generateReason, generateFirstStep } from '../utils/scoring.js';
+import { getAiRecommendation } from './ai.service.js';
 
 export interface RecommendResult {
   decisionId: string | null;
@@ -16,39 +17,31 @@ export async function recommend(
   userId?: string
 ): Promise<RecommendResult | null> {
   // Build filter conditions
-  const where: Prisma.ActivityWhereInput = {
-    durationMin: { lte: input.duration },
-    durationMax: { gte: input.duration },
-  };
-
-  // Energy filter
-  if (input.energy) {
-    where.energyLevel = input.energy;
-  }
+  // Sadece süre ve konum ile filtrele, geri kalanı scoring'e bırak
+  // Bu sayede her zaman yeterli aday bulunur
+  const conditions: Prisma.ActivityWhereInput[] = [
+    { durationMin: { lte: input.duration } },
+    { durationMax: { gte: input.duration } },
+  ];
 
   // Location filter - handle 'any' flexibility
   if (input.location && input.location !== 'any') {
-    where.OR = [
-      { location: input.location },
-      { location: 'any' },
-    ];
+    conditions.push({
+      OR: [{ location: input.location }, { location: 'any' }],
+    });
   }
 
-  // Cost filter
+  // Cost filter - inclusive (bütçen yetiyorsa altındakileri de göster)
+  const costLevels: Record<string, string[]> = {
+    free: ['free'],
+    low: ['free', 'low'],
+    medium: ['free', 'low', 'medium'],
+  };
   if (input.cost) {
-    where.cost = input.cost;
+    conditions.push({ cost: { in: costLevels[input.cost] as any } });
   }
 
-  // Social filter - handle 'both' flexibility
-  if (input.social && input.social !== 'both') {
-    where.OR = where.OR || [];
-    if (Array.isArray(where.OR)) {
-      where.OR = [
-        { social: input.social },
-        { social: 'both' },
-      ];
-    }
-  }
+  const where: Prisma.ActivityWhereInput = { AND: conditions };
 
   // Fetch candidates
   const candidates = await prisma.activity.findMany({
@@ -81,13 +74,30 @@ export async function recommend(
   // Get top candidates (minimum 5 or available)
   const topCandidates = scoredCandidates.slice(0, Math.min(5, scoredCandidates.length));
 
-  // Select top 1 as selected, top 2 as planB
-  const selected = topCandidates[0].activity;
-  const planB = topCandidates.length > 1 ? topCandidates[1].activity : null;
+  // AI ile kişiselleştirilmiş öneri al
+  const topActivities = topCandidates.map((c) => c.activity);
+  const aiResult = await getAiRecommendation(scoringInput, topActivities);
 
-  // Generate reason and first step
-  const reason = generateReason(selected, scoringInput);
-  const firstStep = generateFirstStep(selected);
+  let selected: Activity;
+  let planB: Activity | null;
+  let reason: string;
+  let firstStep: string;
+
+  if (aiResult) {
+    // AI başarılı - AI'ın seçimini kullan
+    selected = topActivities.find((a) => a.id === aiResult.selectedId) || topActivities[0];
+    planB = aiResult.planBId
+      ? topActivities.find((a) => a.id === aiResult.planBId) || null
+      : null;
+    reason = aiResult.reason;
+    firstStep = aiResult.firstStep;
+  } else {
+    // AI başarısız - mevcut scoring sistemine fallback
+    selected = topCandidates[0].activity;
+    planB = topCandidates.length > 1 ? topCandidates[1].activity : null;
+    reason = generateReason(selected, scoringInput);
+    firstStep = generateFirstStep(selected);
+  }
 
   // Save to history if user is authenticated
   let decisionId: string | null = null;
