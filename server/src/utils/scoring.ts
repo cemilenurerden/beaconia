@@ -9,6 +9,18 @@ export interface RecommendInput {
   mood?: string;
 }
 
+export const TURKISH_LABELS = {
+  energy: { low: 'düşük', medium: 'orta', high: 'yüksek' } as Record<string, string>,
+  location: { home: 'evde', outdoor: 'dışarıda', any: 'fark etmez' } as Record<string, string>,
+  cost: { free: 'bedava', low: 'ekonomik', medium: 'orta bütçe' } as Record<string, string>,
+  social: { solo: 'yalnız', friends: 'arkadaşlarla', both: 'fark etmez' } as Record<string, string>,
+  mood: {
+    happy: 'mutlu', motivated: 'motive', excited: 'heyecanlı', sad: 'üzgün',
+    stressed: 'stresli', bored: 'sıkılmış', anxious: 'kaygılı', tired: 'yorgun',
+    creative: 'yaratıcı', energetic: 'enerjik',
+  } as Record<string, string>,
+};
+
 /**
  * Score an activity based on how well it matches the user's preferences
  * Higher score = better match
