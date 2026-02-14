@@ -1,29 +1,15 @@
-import { useState, useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth';
-import { getStats } from '../../src/api/user';
-import type { UserStats } from '../../src/types';
+import { useHomeStats } from '../../src/hooks/useHomeStats';
 
 export default function HomeScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const firstName = user?.name?.split(' ')[0] ?? 'Kullanıcı';
-
-  const [stats, setStats] = useState<UserStats>({
-    dailyCompleted: 0,
-    dailyGoal: 3,
-    streak: 0,
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      getStats().then(setStats).catch(() => {});
-    }, [])
-  );
+  const stats = useHomeStats();
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">

@@ -1,12 +1,11 @@
-import { useState, useMemo } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { AuthHeader } from '../../src/components/auth/AuthHeader';
+import { AuthScreen } from '../../src/components/auth/AuthScreen';
 import { AuthInput } from '../../src/components/auth/AuthInput';
-import { api, ApiError } from '../../src/api/client';
+import { AuthSubmitButton } from '../../src/components/auth/AuthSubmitButton';
+import { api } from '../../src/api/client';
 import { useFormValidation } from '../../src/hooks/useFormValidation';
+import { useAuthSubmit } from '../../src/hooks/useAuthSubmit';
 import { required, minLength, match } from '../../src/utils/validation';
 
 export default function ResetPasswordScreen() {
@@ -15,10 +14,7 @@ export default function ResetPasswordScreen() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  // match kuralı dinamik olarak newPassword'ün güncel değerini alır
   const schema = useMemo(
     () => ({
       newPassword: [required, minLength(6)],
@@ -29,88 +25,44 @@ export default function ResetPasswordScreen() {
 
   const { errors, validateForm, clearFieldError } = useFormValidation(schema);
 
-  const handleReset = async () => {
+  const action = useCallback(async () => {
+    await api.post('/auth/reset-password', { email, code, newPassword });
+    router.replace('/(auth)/login');
+  }, [email, code, newPassword, router]);
+
+  const { loading, error, submit } = useAuthSubmit(action);
+
+  const handleReset = () => {
     if (!validateForm({ newPassword, confirmPassword })) return;
-    setError('');
-    setLoading(true);
-    try {
-      await api.post('/auth/reset-password', { email, code, newPassword });
-      router.replace('/(auth)/login');
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Bir hata oluştu. Tekrar deneyin.');
-    } finally {
-      setLoading(false);
-    }
+    submit();
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="absolute left-0 top-0 bottom-0 w-1 bg-blue-200" />
-      <View className="absolute right-0 top-0 bottom-0 w-1 bg-blue-200" />
+    <AuthScreen
+      navTitle="Yeni Şifre"
+      headerTitle="Yeni Şifre Belirle"
+      headerSubtitle="Hesabınız için yeni bir şifre oluşturun."
+      error={error}
+    >
+      <AuthInput
+        label="Yeni Şifre"
+        placeholder="En az 6 karakter"
+        isPassword
+        value={newPassword}
+        onChangeText={(v) => { setNewPassword(v); clearFieldError('newPassword'); }}
+        error={errors.newPassword}
+      />
 
-      <View className="flex-row items-center px-5 py-3">
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={24} color="#111827" />
-        </Pressable>
-        <Text className="flex-1 text-center text-base font-semibold text-gray-900 mr-6">
-          Yeni Şifre
-        </Text>
-      </View>
+      <AuthInput
+        label="Şifre Tekrar"
+        placeholder="Şifrenizi tekrar girin"
+        isPassword
+        value={confirmPassword}
+        onChangeText={(v) => { setConfirmPassword(v); clearFieldError('confirmPassword'); }}
+        error={errors.confirmPassword}
+      />
 
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 16 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <AuthHeader
-          title="Yeni Şifre Belirle"
-          subtitle="Hesabınız için yeni bir şifre oluşturun."
-        />
-
-        {error !== '' && (
-          <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
-          </View>
-        )}
-
-        <AuthInput
-          label="Yeni Şifre"
-          placeholder="En az 6 karakter"
-          isPassword
-          value={newPassword}
-          onChangeText={(v) => {
-            setNewPassword(v);
-            clearFieldError('newPassword');
-          }}
-          error={errors.newPassword}
-        />
-
-        <AuthInput
-          label="Şifre Tekrar"
-          placeholder="Şifrenizi tekrar girin"
-          isPassword
-          value={confirmPassword}
-          onChangeText={(v) => {
-            setConfirmPassword(v);
-            clearFieldError('confirmPassword');
-          }}
-          error={errors.confirmPassword}
-        />
-
-        <Pressable
-          onPress={handleReset}
-          disabled={loading}
-          className="flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 mt-4 mb-6"
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <>
-              <Text className="text-base font-semibold text-white mr-2">Şifreyi Değiştir</Text>
-              <Ionicons name="arrow-forward" size={18} color="white" />
-            </>
-          )}
-        </Pressable>
-      </ScrollView>
-    </SafeAreaView>
+      <AuthSubmitButton label="Şifreyi Değiştir" loading={loading} onPress={handleReset} />
+    </AuthScreen>
   );
 }

@@ -1,55 +1,22 @@
-import { useRef, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  useWindowDimensions,
-  type ViewabilityConfig,
-  type ViewToken,
-} from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, FlatList, Pressable, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { onboardingPages } from '../src/data/onboarding';
 import { OnboardingPage } from '../src/components/onboarding/OnboardingPage';
 import { DotIndicator } from '../src/components/onboarding/DotIndicator';
-import { useAuthStore } from '../src/store/auth';
+import { useOnboarding } from '../src/hooks/useOnboarding';
 
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
-  const router = useRouter();
-  const flatListRef = useRef<FlatList>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
-
-  const isLastPage = activeIndex === onboardingPages.length - 1;
-
-  const viewabilityConfig: ViewabilityConfig = {
-    viewAreaCoveragePercentThreshold: 50,
-  };
-
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems.length > 0 && viewableItems[0].index != null) {
-        setActiveIndex(viewableItems[0].index);
-      }
-    },
-    [],
-  );
-
-  const handleFinish = () => {
-    completeOnboarding();
-    router.replace('/(auth)/login');
-  };
-
-  const handleNext = () => {
-    if (isLastPage) {
-      handleFinish();
-      return;
-    }
-    flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
-  };
+  const {
+    flatListRef,
+    activeIndex,
+    isLastPage,
+    viewabilityConfig,
+    onViewableItemsChanged,
+    handleFinish,
+    handleNext,
+  } = useOnboarding();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F0' }}>
@@ -87,16 +54,15 @@ export default function OnboardingScreen() {
         <DotIndicator total={onboardingPages.length} activeIndex={activeIndex} />
 
         <View className="mt-16 w-full">
-
-        <Pressable
-          onPress={handleNext}
-          className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-blue-500 py-4"
-        >
-          <Ionicons name="arrow-forward-circle" size={22} color="white" />
-          <Text className="text-base font-semibold text-white">
-            {onboardingPages[activeIndex].buttonText}
-          </Text>
-        </Pressable>
+          <Pressable
+            onPress={handleNext}
+            className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-blue-500 py-4"
+          >
+            <Ionicons name="arrow-forward-circle" size={22} color="white" />
+            <Text className="text-base font-semibold text-white">
+              {onboardingPages[activeIndex].buttonText}
+            </Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
