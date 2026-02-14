@@ -1,44 +1,34 @@
 import type { RecommendInput, UserPreferences } from '../types';
 
-// Form → API
-const energyToApi: Record<string, string> = {
-  'Düşük': 'low',
-  'Orta': 'medium',
-  'Yüksek': 'high',
-};
+/** Çift yönlü mapping: { a: '1', b: '2' } → toB['a'] = '1', toA['1'] = 'a' */
+function biMap(pairs: [string, string][]): { toApi: Record<string, string>; toForm: Record<string, string> } {
+  const toApi: Record<string, string> = {};
+  const toForm: Record<string, string> = {};
+  for (const [form, api] of pairs) {
+    toApi[form] = api;
+    toForm[api] = form;
+  }
+  return { toApi, toForm };
+}
 
-const budgetToApi: Record<string, string> = {
-  'BEDAVA': 'free',
-  'EKONOMİK': 'low',
-  'LÜKS': 'medium',
-};
+const energy = biMap([
+  ['Düşük', 'low'],
+  ['Orta', 'medium'],
+  ['Yüksek', 'high'],
+]);
 
-const moodToApi: Record<string, string> = {
-  '😊': 'happy',
-  '🔥': 'motivated',
-  '🤩': 'excited',
-  '😢': 'sad',
-};
+const budget = biMap([
+  ['BEDAVA', 'free'],
+  ['EKONOMİK', 'low'],
+  ['LÜKS', 'medium'],
+]);
 
-// API → Form
-const energyToForm: Record<string, string> = {
-  'low': 'Düşük',
-  'medium': 'Orta',
-  'high': 'Yüksek',
-};
-
-const budgetToForm: Record<string, string> = {
-  'free': 'BEDAVA',
-  'low': 'EKONOMİK',
-  'medium': 'LÜKS',
-};
-
-const moodToForm: Record<string, string> = {
-  'happy': '😊',
-  'motivated': '🔥',
-  'excited': '🤩',
-  'sad': '😢',
-};
+const mood = biMap([
+  ['😊', 'happy'],
+  ['🔥', 'motivated'],
+  ['🤩', 'excited'],
+  ['😢', 'sad'],
+]);
 
 export interface FormValues {
   duration: number;
@@ -52,21 +42,21 @@ export interface FormValues {
 export function formToApiInput(form: FormValues): RecommendInput {
   return {
     duration: form.duration,
-    energy: (energyToApi[form.energy] || 'medium') as RecommendInput['energy'],
+    energy: (energy.toApi[form.energy] || 'medium') as RecommendInput['energy'],
     location: (form.isHome ? 'home' : 'outdoor') as RecommendInput['location'],
-    cost: (budgetToApi[form.budget] || 'low') as RecommendInput['cost'],
+    cost: (budget.toApi[form.budget] || 'low') as RecommendInput['cost'],
     social: (form.isAlone ? 'solo' : 'friends') as RecommendInput['social'],
-    mood: moodToApi[form.mood] || 'motivated',
+    mood: mood.toApi[form.mood] || 'motivated',
   };
 }
 
 export function preferencesToForm(prefs: UserPreferences): FormValues {
   return {
     duration: prefs.duration,
-    energy: energyToForm[prefs.energy] || 'Orta',
+    energy: energy.toForm[prefs.energy] || 'Orta',
     isHome: prefs.location === 'home',
-    budget: budgetToForm[prefs.cost] || 'EKONOMİK',
+    budget: budget.toForm[prefs.cost] || 'EKONOMİK',
     isAlone: prefs.social === 'solo',
-    mood: moodToForm[prefs.mood || ''] || '🔥',
+    mood: mood.toForm[prefs.mood || ''] || '🔥',
   };
 }

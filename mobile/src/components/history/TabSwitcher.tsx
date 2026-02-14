@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { colors } from '../../constants/theme';
 
 interface Tab {
   key: string;
@@ -15,7 +16,7 @@ export default function TabSwitcher({ tabs, activeTab, onTabChange }: TabSwitche
   return (
     <View style={{
       flexDirection: 'row',
-      backgroundColor: '#F3F4F6',
+      backgroundColor: colors.gray100,
       borderRadius: 16,
       padding: 4,
     }}>
@@ -31,13 +32,13 @@ export default function TabSwitcher({ tabs, activeTab, onTabChange }: TabSwitche
               paddingVertical: 10,
               borderRadius: 12,
               alignItems: 'center',
-              backgroundColor: isActive ? '#7C3AED' : 'transparent',
+              backgroundColor: isActive ? colors.purple : 'transparent',
             }}
           >
             <Text style={{
               fontSize: 14,
               fontWeight: '600',
-              color: isActive ? '#FFFFFF' : '#9CA3AF',
+              color: isActive ? colors.white : colors.gray400,
             }}>
               {tab.label}
             </Text>

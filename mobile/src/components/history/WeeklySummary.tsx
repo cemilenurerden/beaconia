@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { colors } from '../../constants/theme';
 
 interface WeeklySummaryProps {
   totalActivities: number;
@@ -9,14 +10,14 @@ export default function WeeklySummary({ totalActivities, onPress }: WeeklySummar
   return (
     <View style={{
       borderRadius: 20,
-      backgroundColor: '#7C3AED',
+      backgroundColor: colors.purple,
       padding: 22,
       marginTop: 8,
     }}>
-      <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginBottom: 6 }}>
+      <Text style={{ fontSize: 18, fontWeight: '700', color: colors.white, marginBottom: 6 }}>
         Haftalık Özet
       </Text>
-      <Text style={{ fontSize: 14, color: '#DDD6FE', lineHeight: 20, marginBottom: 14 }}>
+      <Text style={{ fontSize: 14, color: colors.purplePale, lineHeight: 20, marginBottom: 14 }}>
         Bu hafta {totalActivities} farklı etkinlik tamamladın. Harika gidiyorsun!
       </Text>
       <TouchableOpacity
@@ -24,13 +25,13 @@ export default function WeeklySummary({ totalActivities, onPress }: WeeklySummar
         activeOpacity={0.8}
         style={{
           alignSelf: 'flex-start',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.white,
           paddingHorizontal: 18,
           paddingVertical: 10,
           borderRadius: 12,
         }}
       >
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#7C3AED' }}>Analizi Gör</Text>
+        <Text style={{ fontSize: 14, fontWeight: '700', color: colors.purple }}>Analizi Gör</Text>
       </TouchableOpacity>
     </View>
   );

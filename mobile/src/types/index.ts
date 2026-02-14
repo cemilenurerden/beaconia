@@ -86,6 +86,12 @@ export interface Decision {
   createdAt: string;
 }
 
+// ---- History Section ----
+export interface Section {
+  title: string;
+  data: Decision[];
+}
+
 // ---- API Response ----
 export interface ApiSuccessResponse<T> {
   data: T;
