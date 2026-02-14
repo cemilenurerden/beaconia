@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { getPreferences, updatePreferences } from '../src/api/user';
 import { getRecommendation } from '../src/api/recommend';
+import { addFavorite } from '../src/api/favorites';
 import { formToApiInput, preferencesToForm } from '../src/utils/mappers';
 import type { RecommendResult } from '../src/types';
 
@@ -162,10 +163,12 @@ function ResultScreen({
   result,
   onRetry,
   onBack,
+  onFavorite,
 }: {
   result: RecommendResult;
   onRetry: () => void;
   onBack: () => void;
+  onFavorite: () => void;
 }) {
   const [showPlanB, setShowPlanB] = useState(false);
   const { selected, reason, firstStep, planB } = result;
@@ -260,7 +263,7 @@ function ResultScreen({
         borderTopWidth: 1, borderTopColor: '#F3F4F6',
         justifyContent: 'space-around',
       }}>
-        <TouchableOpacity onPress={onBack} activeOpacity={0.7} style={{ alignItems: 'center' }}>
+        <TouchableOpacity onPress={onFavorite} activeOpacity={0.7} style={{ alignItems: 'center' }}>
           <Ionicons name="thumbs-up" size={24} color="#059669" />
           <Text style={{ fontSize: 11, fontWeight: '600', color: '#059669', marginTop: 4 }}>HARİKA</Text>
         </TouchableOpacity>
@@ -290,6 +293,7 @@ export default function ActivitySuggestScreen() {
 
   const [phase, setPhase] = useState<Phase>('form');
   const [result, setResult] = useState<RecommendResult | null>(null);
+  const [excludeIds, setExcludeIds] = useState<string[]>([]);
 
   // Sayfa açılışında önceki tercihleri yükle
   useEffect(() => {
@@ -305,13 +309,31 @@ export default function ActivitySuggestScreen() {
     }).catch(() => {});
   }, []);
 
-  async function handleRecommend() {
+  async function handleFavorite() {
+    if (!result) return;
+    try {
+      await addFavorite(result.selected.id);
+      Alert.alert('Favorilere Eklendi', `${result.selected.title} favorilerine eklendi!`);
+      setPhase('form');
+    } catch {
+      Alert.alert('Bilgi', 'Bu aktivite zaten favorilerinde.');
+    }
+  }
+
+  async function handleRecommend(retry = false) {
     setPhase('loading');
     try {
       const input = formToApiInput({ duration, energy, isHome, budget, isAlone, mood });
+      const currentExcludes = retry && result ? [...excludeIds, result.selected.id] : [];
+
+      if (retry && result) {
+        setExcludeIds(currentExcludes);
+      } else {
+        setExcludeIds([]);
+      }
 
       const [rec] = await Promise.all([
-        getRecommendation(input),
+        getRecommendation({ ...input, excludeIds: currentExcludes.length > 0 ? currentExcludes : undefined }),
         updatePreferences(input),
       ]);
 
@@ -338,8 +360,9 @@ export default function ActivitySuggestScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F4FF' }}>
         <ResultScreen
           result={result}
-          onRetry={handleRecommend}
-          onBack={() => setPhase('form')}
+          onRetry={() => handleRecommend(true)}
+          onBack={() => { setPhase('form'); setExcludeIds([]); }}
+          onFavorite={handleFavorite}
         />
       </SafeAreaView>
     );

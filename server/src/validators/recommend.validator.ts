@@ -12,6 +12,7 @@ export const recommendSchema = z.object({
   cost: costEnum,
   social: socialEnum,
   mood: z.string().optional(),
+  excludeIds: z.array(z.string().uuid()).optional(),
 });
 
 export type RecommendInput = z.infer<typeof recommendSchema>;

@@ -40,5 +40,4 @@ yarn-error.*
 /ios
 /android
 
-# assets images (design references)
-assets/images/
+

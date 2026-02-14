@@ -62,6 +62,7 @@ export interface RecommendInput {
   cost: Cost;
   social: Social;
   mood?: string;
+  excludeIds?: string[];
 }
 
 export interface RecommendResult {

@@ -41,6 +41,11 @@ export async function recommend(
     conditions.push({ cost: { in: costLevels[input.cost] as any } });
   }
 
+  // Exclude previously shown activities
+  if (input.excludeIds && input.excludeIds.length > 0) {
+    conditions.push({ id: { notIn: input.excludeIds } });
+  }
+
   const where: Prisma.ActivityWhereInput = { AND: conditions };
 
   // Fetch candidates
