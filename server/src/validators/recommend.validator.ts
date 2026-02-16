@@ -14,6 +14,7 @@ export const recommendSchema = z.object({
   mood: z.string().optional(),
   goal: z.string().optional(),
   excludeIds: z.array(z.string().uuid()).optional(),
+  isRetry: z.boolean().optional(),
 });
 
 export type RecommendInput = z.infer<typeof recommendSchema>;

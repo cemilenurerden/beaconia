@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   city: string | null;
+  isPremium: boolean;
   createdAt: string;
 }
 
@@ -65,6 +66,7 @@ export interface RecommendInput {
   mood?: string;
   goal?: string;
   excludeIds?: string[];
+  isRetry?: boolean;
 }
 
 export interface RecommendResult {
@@ -73,6 +75,7 @@ export interface RecommendResult {
   reason: string;
   firstStep: string;
   planB: Activity | null;
+  refreshRemaining?: number;
 }
 
 // ---- Decision History ----
