@@ -7,6 +7,7 @@ export interface RecommendInput {
   cost: Cost;
   social: Social;
   mood?: string;
+  goal?: string;
 }
 
 export const TURKISH_LABELS = {
@@ -17,7 +18,13 @@ export const TURKISH_LABELS = {
   mood: {
     happy: 'mutlu', motivated: 'motive', excited: 'heyecanlı', sad: 'üzgün',
     stressed: 'stresli', bored: 'sıkılmış', anxious: 'kaygılı', tired: 'yorgun',
-    creative: 'yaratıcı', energetic: 'enerjik',
+    creative: 'yaratıcı', energetic: 'enerjik', relaxed: 'sakin',
+  } as Record<string, string>,
+  goal: {
+    'self-improvement': 'kendini geliştirmek',
+    fun: 'eğlenmek',
+    relax: 'rahatlamak',
+    productive: 'üretken olmak',
   } as Record<string, string>,
 };
 
@@ -60,6 +67,20 @@ export function scoreActivity(activity: Activity, input: RecommendInput): number
   // Mood match bonus (big bonus if mood matches)
   if (input.mood && activity.moodTags.includes(input.mood)) {
     score += 30;
+  }
+
+  // Goal-category match bonus
+  if (input.goal) {
+    const goalCategories: Record<string, string[]> = {
+      'self-improvement': ['education', 'productivity', 'puzzle'],
+      fun: ['entertainment', 'social', 'music', 'hobby', 'adventure'],
+      relax: ['wellness', 'self-care', 'art', 'culture'],
+      productive: ['productivity', 'cooking', 'education'],
+    };
+    const preferred = goalCategories[input.goal];
+    if (preferred?.includes(activity.category)) {
+      score += 25;
+    }
   }
 
   // Add random jitter for variety (±5 points)

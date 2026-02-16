@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
-import { ENERGY_OPTIONS, BUDGET_OPTIONS, MOOD_OPTIONS } from '../src/constants/activity-suggest';
+import { ENERGY_OPTIONS, BUDGET_OPTIONS, MOOD_OPTIONS, GOAL_OPTIONS } from '../src/constants/activity-suggest';
 import { useActivitySuggest } from '../src/hooks/useActivitySuggest';
 import LoadingScreen from '../src/components/activity-suggest/LoadingScreen';
 import ResultScreen from '../src/components/activity-suggest/ResultScreen';
@@ -17,6 +17,7 @@ export default function ActivitySuggestScreen() {
     budget, setBudget,
     isAlone, setIsAlone,
     mood, setMood,
+    goal, setGoal,
     phase, result,
     handleRecommend, handleFavorite, resetToForm,
   } = useActivitySuggest();
@@ -207,12 +208,44 @@ export default function ActivitySuggestScreen() {
           />
         </View>
 
+        {/* Bugün ne yapmak istiyorsun? */}
+        <View className="mb-8">
+          <Text className="text-xs font-bold text-gray-500 tracking-wider mb-3">
+            BUGÜN NE YAPMAK İSTİYORSUN?
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
+            {GOAL_OPTIONS.map((opt) => {
+              const isSelected = goal === opt.label;
+              return (
+                <TouchableOpacity
+                  key={opt.label}
+                  onPress={() => setGoal(isSelected ? '' : opt.label)}
+                  activeOpacity={0.7}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 10,
+                    paddingHorizontal: 14,
+                    borderRadius: 20,
+                    backgroundColor: isSelected ? '#3B82F6' : '#F3F4F6',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, marginRight: 6 }}>{opt.emoji}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: isSelected ? '#FFFFFF' : '#374151' }}>
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
         {/* Nasıl hissediyorsun? */}
         <View className="mb-8">
           <Text className="text-xs font-bold text-gray-500 tracking-wider mb-3">
             NASIL HİSSEDİYORSUN?
           </Text>
-          <View className="flex-row gap-3">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
             {MOOD_OPTIONS.map((emoji) => (
               <TouchableOpacity
                 key={emoji}
@@ -232,7 +265,7 @@ export default function ActivitySuggestScreen() {
                 <Text style={{ fontSize: 24 }}>{emoji}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Alt boşluk (buton için) */}

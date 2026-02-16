@@ -3,6 +3,7 @@ import { Activity } from '@prisma/client';
 import { RecommendInput, TURKISH_LABELS } from '../utils/scoring.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const AI_TIMEOUT = 25_000;
 
 export interface AiRecommendation {
   selectedId: string;
@@ -21,24 +22,54 @@ function buildPrompt(input: RecommendInput, candidates: Activity[]): string {
 
   const t = TURKISH_LABELS;
 
-  return `Sen Beaconia uygulamasının yapay zeka asistanısın. Kullanıcının ruh haline ve tercihlerine göre en uygun aktiviteyi seçip, sıcak ve samimi bir dille Türkçe açıklama yapmalısın.
+  const goalContext = input.goal
+    ? {
+        'self-improvement': 'Kullanıcı kendini geliştirmek, yeni şeyler öğrenmek ve kişisel gelişimine yatırım yapmak istiyor. Eğitici, zihin açıcı ve beceri kazandıran aktiviteleri tercih et.',
+        fun: 'Kullanıcı eğlenmek, kafasını dağıtmak ve keyifli vakit geçirmek istiyor. Sıkıcı veya zorlayıcı aktivitelerden kaçın, neşeli ve rahat seçenekleri öner.',
+        relax: 'Kullanıcı rahatlamak, stresten uzaklaşmak ve huzur bulmak istiyor. Sakinleştirici, düşük tempolu ve dinlendirici aktiviteleri tercih et.',
+        productive: 'Kullanıcı üretken olmak, bir şeyler başarmak ve zamanını verimli kullanmak istiyor. Somut bir çıktısı olan, tamamlandığında tatmin hissi verecek aktiviteleri öner.',
+      }[input.goal] || ''
+    : '';
 
-KULLANICI BİLGİLERİ:
+  const moodContext = input.mood
+    ? {
+        happy: 'Kullanıcı şu an mutlu ve pozitif. Bu enerjiyi koruyacak, keyifli aktiviteler öner.',
+        motivated: 'Kullanıcı motive ve kararlı. Bu ivmeyi değerlendirecek, hedef odaklı aktiviteler öner.',
+        excited: 'Kullanıcı heyecanlı ve coşkulu. Bu heyecanı karşılayacak dinamik aktiviteler öner.',
+        sad: 'Kullanıcı üzgün hissediyor. Moralini yükseltecek, nazik ve şefkatli öneriler sun. Zorlayıcı aktivitelerden kaçın.',
+        tired: 'Kullanıcı yorgun. Fazla enerji gerektirmeyen ama yine de iyi hissettirecek hafif aktiviteler öner.',
+        stressed: 'Kullanıcı stresli. Rahatlatan, zihinsel yükü azaltan ve nefes aldıran aktiviteler öner.',
+        bored: 'Kullanıcı sıkılmış. Dikkat çekici, merak uyandıran ve rutinden koparan aktiviteler öner.',
+        relaxed: 'Kullanıcı sakin ve huzurlu. Bu hali bozmayacak, akışına bırakacak hafif aktiviteler öner.',
+      }[input.mood] || ''
+    : '';
+
+  return `Sen Beaconia'nın kişisel aktivite asistanısın. Kullanıcıyı çok iyi tanıyan, samimi bir arkadaş gibi öneri yapıyorsun. Senlik cümleler kur, resmi olma.
+
+KULLANICI PROFİLİ:
 - Boş zamanı: ${input.duration} dakika
 - Enerji seviyesi: ${t.energy[input.energy] || input.energy}
 - Ruh hali: ${input.mood ? (t.mood[input.mood] || input.mood) : 'belirtilmedi'}
 - Konum: ${t.location[input.location] || input.location}
 - Bütçe: ${t.cost[input.cost] || input.cost}
 - Sosyal tercih: ${t.social[input.social] || input.social}
+- Amaç: ${input.goal ? (t.goal[input.goal] || input.goal) : 'belirtilmedi'}
 
+${goalContext ? `AMAÇ DETAYI:\n${goalContext}\n` : ''}${moodContext ? `RUH HALİ DETAYI:\n${moodContext}\n` : ''}
 ADAY AKTİVİTELER:
 ${activitiesText}
 
-GÖREV:
-1. Kullanıcının durumuna en uygun aktiviteyi seç (selectedId).
-2. Alternatif olarak bir Plan B seç (planBId). Eğer tek aday varsa null yaz.
-3. "reason" alanında kullanıcıya neden bu aktiviteyi önerdiğini samimi, kişisel ve motive edici bir dille açıkla (2-3 cümle, Türkçe).
-4. "firstStep" alanında kullanıcının hemen başlayabileceği somut bir ilk adım yaz (1 cümle, Türkçe).
+SEÇİM KRİTERLERİ (öncelik sırasına göre):
+1. Ruh hali + Amaç uyumu: Kullanıcının şu anki duygusal durumuna ve hedefine en uygun aktiviteyi seç. Örneğin stresli + rahatlamak isteyen birine HIIT önerme.
+2. Enerji uyumu: Düşük enerjili birine yüksek enerji gerektiren aktivite önerme.
+3. Süre uyumu: Kullanıcının boş zamanına sığacak aktivite seç.
+4. Konum ve bütçe: Kullanıcının bulunduğu yere ve bütçesine uygun olsun.
+5. Plan B: Ana öneriden farklı bir kategoride alternatif sun. Mesela ana öneri wellness ise Plan B entertainment olabilir.
+
+YANIT KURALLARI:
+- "reason": Kullanıcıya neden bu aktiviteyi seçtiğini açıkla. Samimi, kişisel ve motive edici ol. Kullanıcının ruh halini ve amacını direkt referans al. 2-3 kısa cümle. Sen-dili kullan. Örnek: "Biraz stresli görünüyorsun, böyle zamanlarda..." gibi.
+- "firstStep": Hemen şimdi yapılabilecek çok somut ve kolay bir ilk adım. Motivasyonu kırmayacak kadar basit olsun. 1 cümle.
+- Plan B yoksa veya tek aday varsa planBId: null yaz.
 
 ZORUNLU: Sadece aşağıdaki JSON formatında yanıt ver, başka hiçbir şey yazma:
 {"selectedId": "...", "planBId": "..." veya null, "reason": "...", "firstStep": "..."}`;
@@ -51,7 +82,12 @@ export async function getAiRecommendation(
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-    const result = await model.generateContent(buildPrompt(input, candidates));
+    const result = await Promise.race([
+      model.generateContent(buildPrompt(input, candidates)),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI timeout')), AI_TIMEOUT)
+      ),
+    ]);
     const text = result.response.text().trim();
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);

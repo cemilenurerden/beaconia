@@ -6,7 +6,14 @@ export const BUDGET_OPTIONS = [
   { label: '₺₺', sub: 'LÜKS' },
 ] as const;
 
-export const MOOD_OPTIONS = ['😊', '🔥', '🤩', '😢'] as const;
+export const MOOD_OPTIONS = ['😊', '🔥', '🤩', '😢', '😴', '😤', '🤔', '😌'] as const;
+
+export const GOAL_OPTIONS = [
+  { emoji: '📚', label: 'Gelişmek' },
+  { emoji: '🎉', label: 'Eğlenmek' },
+  { emoji: '🧘', label: 'Rahatlamak' },
+  { emoji: '⚡', label: 'Üretken Olmak' },
+] as const;
 
 export const LOADING_MESSAGES = [
   'Enerjine uygun aktiviteler taranıyor...',

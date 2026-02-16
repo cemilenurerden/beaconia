@@ -2,7 +2,7 @@ import { API_URL } from '../constants';
 import { useAuthStore } from '../store/auth';
 import type { ApiErrorResponse } from '../types';
 
-const REQUEST_TIMEOUT = 15_000;
+const REQUEST_TIMEOUT = 45_000;
 
 class ApiClient {
   private baseURL: string;
