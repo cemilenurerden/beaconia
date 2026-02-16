@@ -8,6 +8,7 @@ const FEEDBACK_CONFIG: Record<string, { label: string; color: string; bg: string
   up: { label: 'İYİ GELDİ', color: colors.green, bg: colors.greenLight },
   down: { label: 'SEVMEDİM', color: colors.red, bg: colors.redLight },
   retry: { label: 'HARİKA', color: colors.purple, bg: colors.purpleLight },
+  plan_b: { label: 'PLAN B', color: colors.blue, bg: colors.blueLight },
 };
 
 interface ActivityCardProps {

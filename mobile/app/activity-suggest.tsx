@@ -19,7 +19,7 @@ export default function ActivitySuggestScreen() {
     mood, setMood,
     goal, setGoal,
     phase, result, refreshCount,
-    handleRecommend, handleFavorite, resetToForm,
+    handleRecommend, handleFavorite, handleSelectPlanB, resetToForm,
   } = useActivitySuggest();
 
   // ─── Loading ───
@@ -40,6 +40,7 @@ export default function ActivitySuggestScreen() {
           onRetry={() => handleRecommend(true)}
           onBack={resetToForm}
           onFavorite={handleFavorite}
+          onSelectPlanB={handleSelectPlanB}
           refreshCount={refreshCount}
         />
       </SafeAreaView>
