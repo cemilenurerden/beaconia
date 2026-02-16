@@ -4,6 +4,41 @@ import { RecommendInput } from '../validators/recommend.validator.js';
 import { scoreActivity, generateReason, generateFirstStep } from '../utils/scoring.js';
 import { getAiRecommendation } from './ai.service.js';
 
+const MAX_DAILY_REFRESHES = 3;
+
+export async function checkAndIncrementRefresh(userId: string): Promise<{ allowed: boolean; remaining: number }> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { allowed: false, remaining: 0 };
+
+  // Premium kullanıcılar sınırsız
+  if (user.isPremium) return { allowed: true, remaining: -1 };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let currentCount = user.dailyRefreshCount;
+
+  // Eğer son yenileme bugün değilse sayacı sıfırla
+  if (!user.lastRefreshDate || user.lastRefreshDate < today) {
+    currentCount = 0;
+  }
+
+  if (currentCount >= MAX_DAILY_REFRESHES) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  // Sayacı artır
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      dailyRefreshCount: currentCount + 1,
+      lastRefreshDate: new Date(),
+    },
+  });
+
+  return { allowed: true, remaining: MAX_DAILY_REFRESHES - currentCount - 1 };
+}
+
 export interface RecommendResult {
   decisionId: string | null;
   selected: Activity;
@@ -39,6 +74,11 @@ export async function recommend(
   };
   if (input.cost) {
     conditions.push({ cost: { in: costLevels[input.cost] as any } });
+  }
+
+  // excludeIds varsa daha önce gösterilen aktiviteleri hariç tut
+  if (input.excludeIds && input.excludeIds.length > 0) {
+    conditions.push({ id: { notIn: input.excludeIds } });
   }
 
   const where: Prisma.ActivityWhereInput = { AND: conditions };

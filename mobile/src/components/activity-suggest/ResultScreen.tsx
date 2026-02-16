@@ -4,14 +4,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { CATEGORY_ICONS } from '../../constants/activity-suggest';
 import type { RecommendResult } from '../../types';
 
+const MAX_FREE_REFRESHES = 3;
+
 interface ResultScreenProps {
   result: RecommendResult;
   onRetry: () => void;
   onBack: () => void;
   onFavorite: () => void;
+  refreshCount: number;
 }
 
-export default function ResultScreen({ result, onRetry, onBack, onFavorite }: ResultScreenProps) {
+export default function ResultScreen({ result, onRetry, onBack, onFavorite, refreshCount }: ResultScreenProps) {
   const [showPlanB, setShowPlanB] = useState(false);
   const { selected, reason, firstStep, planB } = result;
   const icon = CATEGORY_ICONS[selected.category] || '✨';
@@ -111,7 +114,12 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite }: Re
         </TouchableOpacity>
         <TouchableOpacity onPress={onRetry} activeOpacity={0.7} style={{ alignItems: 'center' }}>
           <Ionicons name="refresh" size={24} color="#F59E0B" />
-          <Text style={{ fontSize: 11, fontWeight: '600', color: '#F59E0B', marginTop: 4 }}>YENİLE</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+            <Text style={{ fontSize: 11, fontWeight: '600', color: '#F59E0B' }}>YENİLE</Text>
+            <Text style={{ fontSize: 10, fontWeight: '600', color: '#9CA3AF', marginLeft: 4 }}>
+              {MAX_FREE_REFRESHES - refreshCount}/{MAX_FREE_REFRESHES}
+            </Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={onBack} activeOpacity={0.7} style={{ alignItems: 'center' }}>
           <Ionicons name="hand-left" size={24} color="#EF4444" />

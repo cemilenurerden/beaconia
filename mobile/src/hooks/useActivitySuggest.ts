@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
+import { router } from 'expo-router';
 import { getPreferences, updatePreferences } from '../api/user';
 import { getRecommendation } from '../api/recommend';
 import { addFavorite } from '../api/favorites';
@@ -19,6 +20,7 @@ export function useActivitySuggest() {
   const [phase, setPhase] = useState<Phase>('form');
   const [result, setResult] = useState<RecommendResult | null>(null);
   const [excludeIds, setExcludeIds] = useState<string[]>([]);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   // Sayfa açılışında önceki tercihleri yükle
   useEffect(() => {
@@ -59,13 +61,28 @@ export function useActivitySuggest() {
       }
 
       const [rec] = await Promise.all([
-        getRecommendation({ ...input, excludeIds: currentExcludes.length > 0 ? currentExcludes : undefined }),
+        getRecommendation({
+          ...input,
+          excludeIds: currentExcludes.length > 0 ? currentExcludes : undefined,
+          isRetry: retry || undefined,
+        }),
         updatePreferences(input),
       ]);
 
       setResult(rec);
+      if (retry) {
+        setRefreshCount((c) => c + 1);
+      } else {
+        setRefreshCount(0);
+      }
       setPhase('result');
     } catch (error: any) {
+      // Backend'den refresh limit hatası gelirse premium sayfasına yönlendir
+      if (error.code === 'REFRESH_LIMIT') {
+        setPhase('result');
+        router.push('/premium');
+        return;
+      }
       Alert.alert('Hata', error.message || 'Öneri alınamadı. Lütfen tekrar dene.');
       setPhase('form');
     }
@@ -86,7 +103,7 @@ export function useActivitySuggest() {
     mood, setMood,
     goal, setGoal,
     // Phase & result
-    phase, result,
+    phase, result, refreshCount,
     // Actions
     handleRecommend, handleFavorite, resetToForm,
   };
