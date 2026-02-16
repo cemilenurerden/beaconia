@@ -41,17 +41,12 @@ export async function recommend(
     conditions.push({ cost: { in: costLevels[input.cost] as any } });
   }
 
-  // Exclude previously shown activities
-  if (input.excludeIds && input.excludeIds.length > 0) {
-    conditions.push({ id: { notIn: input.excludeIds } });
-  }
-
   const where: Prisma.ActivityWhereInput = { AND: conditions };
 
   // Fetch candidates
   const candidates = await prisma.activity.findMany({
     where,
-    take: 50, // Get more than needed for scoring
+    take: 50,
   });
 
   if (candidates.length === 0) {
@@ -66,6 +61,7 @@ export async function recommend(
     cost: input.cost,
     social: input.social,
     mood: input.mood,
+    goal: input.goal,
   };
 
   const scoredCandidates = candidates.map((activity) => ({

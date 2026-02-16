@@ -52,6 +52,7 @@ export interface UserPreferences {
   cost: string;
   social: string;
   mood?: string;
+  goal?: string;
 }
 
 // ---- Recommend ----
@@ -62,6 +63,7 @@ export interface RecommendInput {
   cost: Cost;
   social: Social;
   mood?: string;
+  goal?: string;
   excludeIds?: string[];
 }
 

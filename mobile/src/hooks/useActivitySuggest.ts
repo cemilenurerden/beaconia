@@ -14,6 +14,7 @@ export function useActivitySuggest() {
   const [budget, setBudget] = useState<string>('EKONOMİK');
   const [isAlone, setIsAlone] = useState(false);
   const [mood, setMood] = useState<string>('🔥');
+  const [goal, setGoal] = useState<string>('');
 
   const [phase, setPhase] = useState<Phase>('form');
   const [result, setResult] = useState<RecommendResult | null>(null);
@@ -30,6 +31,7 @@ export function useActivitySuggest() {
       setBudget(form.budget);
       setIsAlone(form.isAlone);
       setMood(form.mood);
+      if (form.goal) setGoal(form.goal);
     }).catch(() => {});
   }, []);
 
@@ -47,7 +49,7 @@ export function useActivitySuggest() {
   async function handleRecommend(retry = false) {
     setPhase('loading');
     try {
-      const input = formToApiInput({ duration, energy, isHome, budget, isAlone, mood });
+      const input = formToApiInput({ duration, energy, isHome, budget, isAlone, mood, goal });
       const currentExcludes = retry && result ? [...excludeIds, result.selected.id] : [];
 
       if (retry && result) {
@@ -82,6 +84,7 @@ export function useActivitySuggest() {
     budget, setBudget,
     isAlone, setIsAlone,
     mood, setMood,
+    goal, setGoal,
     // Phase & result
     phase, result,
     // Actions

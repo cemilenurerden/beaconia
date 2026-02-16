@@ -28,6 +28,17 @@ const mood = biMap([
   ['🔥', 'motivated'],
   ['🤩', 'excited'],
   ['😢', 'sad'],
+  ['😴', 'tired'],
+  ['😤', 'stressed'],
+  ['🤔', 'bored'],
+  ['😌', 'relaxed'],
+]);
+
+const goal = biMap([
+  ['Gelişmek', 'self-improvement'],
+  ['Eğlenmek', 'fun'],
+  ['Rahatlamak', 'relax'],
+  ['Üretken Olmak', 'productive'],
 ]);
 
 export interface FormValues {
@@ -37,6 +48,7 @@ export interface FormValues {
   budget: string;
   isAlone: boolean;
   mood: string;
+  goal: string;
 }
 
 export function formToApiInput(form: FormValues): RecommendInput {
@@ -47,6 +59,7 @@ export function formToApiInput(form: FormValues): RecommendInput {
     cost: (budget.toApi[form.budget] || 'low') as RecommendInput['cost'],
     social: (form.isAlone ? 'solo' : 'friends') as RecommendInput['social'],
     mood: mood.toApi[form.mood] || 'motivated',
+    goal: goal.toApi[form.goal] || undefined,
   };
 }
 
@@ -58,5 +71,6 @@ export function preferencesToForm(prefs: UserPreferences): FormValues {
     budget: budget.toForm[prefs.cost] || 'EKONOMİK',
     isAlone: prefs.social === 'solo',
     mood: mood.toForm[prefs.mood || ''] || '🔥',
+    goal: goal.toForm[prefs.goal || ''] || '',
   };
 }
