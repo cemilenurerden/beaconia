@@ -8,10 +8,20 @@ export const colors = {
   gray500: '#6B7280',
   gray900: '#111827',
 
+  // Slate (dark theme)
+  slate900: '#0F172A',
+  slate800: '#1E293B',
+  slate700: '#334155',
+  slate600: '#475569',
+  slate500: '#64748B',
+  slate400: '#94A3B8',
+  slate300: '#CBD5E1',
+
   // Primary (purple)
   purple: '#7C3AED',
   purpleLight: '#EDE9FE',
   purplePale: '#DDD6FE',
+  purpleMid: '#A78BFA',
 
   // Blue
   blue: '#3B82F6',
