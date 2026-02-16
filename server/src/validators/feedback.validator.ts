@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const feedbackEnum = z.enum(['up', 'down', 'retry']);
+const feedbackEnum = z.enum(['up', 'down', 'retry', 'plan_b']);
 
 export const feedbackSchema = z.object({
   decisionId: z.string().uuid('Geçerli bir decision ID giriniz'),

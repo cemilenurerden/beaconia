@@ -42,4 +42,6 @@ export const CATEGORY_ICONS: Record<string, string> = {
   puzzle: '🧠',
 };
 
+export const PLAN_B_REASONS = ['Üşendim', 'Mekan uygun değil', 'Vaktim azaldı', 'Modumda değilim'] as const;
+
 export type Phase = 'form' | 'loading' | 'result';

@@ -19,7 +19,7 @@ export type EnergyLevel = 'low' | 'medium' | 'high';
 export type Location = 'home' | 'outdoor' | 'any';
 export type Cost = 'free' | 'low' | 'medium';
 export type Social = 'solo' | 'friends' | 'both';
-export type Feedback = 'up' | 'down' | 'retry';
+export type Feedback = 'up' | 'down' | 'retry' | 'plan_b';
 
 export interface Activity {
   id: string;

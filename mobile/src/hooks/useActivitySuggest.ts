@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { getPreferences, updatePreferences } from '../api/user';
 import { getRecommendation } from '../api/recommend';
 import { addFavorite } from '../api/favorites';
+import { submitFeedback } from '../api/feedback';
 import { formToApiInput, preferencesToForm } from '../utils/mappers';
 import type { Phase } from '../constants/activity-suggest';
 import type { RecommendResult } from '../types';
@@ -88,6 +89,15 @@ export function useActivitySuggest() {
     }
   }
 
+  async function handleSelectPlanB(reason?: string) {
+    if (!result?.decisionId) return;
+    try {
+      await submitFeedback({ decisionId: result.decisionId, feedback: 'plan_b', reason });
+    } catch {}
+    Alert.alert('Plan B Seçildi', `${result.planB?.title} ile devam ediyorsun!`);
+    setPhase('form');
+  }
+
   function resetToForm() {
     setPhase('form');
     setExcludeIds([]);
@@ -105,6 +115,6 @@ export function useActivitySuggest() {
     // Phase & result
     phase, result, refreshCount,
     // Actions
-    handleRecommend, handleFavorite, resetToForm,
+    handleRecommend, handleFavorite, handleSelectPlanB, resetToForm,
   };
 }

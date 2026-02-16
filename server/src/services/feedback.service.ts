@@ -17,14 +17,26 @@ export async function submit(userId: string, input: FeedbackInput) {
     throw new ApiError(403, 'FORBIDDEN', 'You can only provide feedback for your own decisions');
   }
 
-  // Update feedback
-  await prisma.decisionHistory.update({
-    where: { id: input.decisionId },
-    data: {
-      feedback: input.feedback,
-      feedbackReason: input.reason || null,
-    },
-  });
+  // Plan B seçildiyse: selectedActivity ile planBActivity yer değiştirsin
+  if (input.feedback === 'plan_b' && decision.planBActivityId) {
+    await prisma.decisionHistory.update({
+      where: { id: input.decisionId },
+      data: {
+        feedback: input.feedback,
+        feedbackReason: input.reason || null,
+        selectedActivityId: decision.planBActivityId,
+        planBActivityId: decision.selectedActivityId,
+      },
+    });
+  } else {
+    await prisma.decisionHistory.update({
+      where: { id: input.decisionId },
+      data: {
+        feedback: input.feedback,
+        feedbackReason: input.reason || null,
+      },
+    });
+  }
 
   return { ok: true };
 }
