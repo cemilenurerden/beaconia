@@ -9,5 +9,5 @@ const DEV_HOST = Platform.select({
 });
 
 export const API_URL = __DEV__
-  ? `http://${DEV_HOST}:3001`
+  ? `http://${DEV_HOST}:3000`
   : 'https://api.beaconia.com';
