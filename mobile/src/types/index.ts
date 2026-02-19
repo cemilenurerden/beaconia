@@ -56,6 +56,19 @@ export interface UserPreferences {
   goal?: string;
 }
 
+// ---- Profile Analysis ----
+export interface ProfileAnalysis {
+  totalActivities: number;
+  longestStreak: number;
+  favoriteActivity: string;
+  weeklyHours: number;
+  categoryDistribution: { category: string; percentage: number }[];
+  topEnergy: string;
+  topLocation: string;
+  topSocial: string;
+  topMoods: string[];
+}
+
 // ---- Recommend ----
 export interface RecommendInput {
   duration: number;

@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { UserStats, UserPreferences } from '../types';
+import type { UserStats, UserPreferences, ProfileAnalysis } from '../types';
 
 export function getStats() {
   return api.get<UserStats>('/user/stats');
@@ -11,4 +11,8 @@ export function getPreferences() {
 
 export function updatePreferences(preferences: UserPreferences) {
   return api.put<UserPreferences>('/user/preferences', preferences);
+}
+
+export function getProfileAnalysis() {
+  return api.get<ProfileAnalysis>('/user/profile-analysis');
 }

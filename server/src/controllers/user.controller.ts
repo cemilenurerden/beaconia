@@ -44,3 +44,17 @@ export async function updatePreferences(
     next(error);
   }
 }
+
+export async function getProfileAnalysis(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const analysis = await userService.getProfileAnalysis(userId);
+    sendSuccess(res, analysis);
+  } catch (error) {
+    next(error);
+  }
+}

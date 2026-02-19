@@ -94,7 +94,7 @@ export default function PremiumScreen() {
             Beaconia Premium
           </Text>
           <Text style={{ fontSize: 16, color: colors.slate400, textAlign: 'center', marginTop: 12, lineHeight: 24 }}>
-            Günlük yenileme limitini kaldır, sınırsız öneri al ve daha fazlasını keşfet.
+            Ücretsiz planda günde 1 öneri ve 3 yenileme hakkın var. Premium ile sınırsız kullan!
           </Text>
         </View>
 
@@ -115,7 +115,7 @@ export default function PremiumScreen() {
               Günlük hakkın doldu!
             </Text>
             <Text style={{ fontSize: 13, color: colors.slate400, marginTop: 4 }}>
-              Ücretsiz planda günde 3 yenileme hakkın var. Premium ile sınırsız yenile!
+              Ücretsiz planda günde 1 öneri ve 3 yenileme hakkın var. Premium ile sınırsız kullan!
             </Text>
           </View>
         </View>

@@ -5,6 +5,7 @@ import { scoreActivity, generateReason, generateFirstStep } from '../utils/scori
 import { getAiRecommendation } from './ai.service.js';
 
 const MAX_DAILY_REFRESHES = 3;
+const MAX_DAILY_RECOMMENDS = 1;
 
 export async function checkAndIncrementRefresh(userId: string): Promise<{ allowed: boolean; remaining: number }> {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -37,6 +38,39 @@ export async function checkAndIncrementRefresh(userId: string): Promise<{ allowe
   });
 
   return { allowed: true, remaining: MAX_DAILY_REFRESHES - currentCount - 1 };
+}
+
+export async function checkAndIncrementRecommend(userId: string): Promise<{ allowed: boolean; remaining: number }> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { allowed: false, remaining: 0 };
+
+  // Premium kullanıcılar sınırsız
+  if (user.isPremium) return { allowed: true, remaining: -1 };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let currentCount = user.dailyRecommendCount;
+
+  // Eğer son öneri bugün değilse sayacı sıfırla
+  if (!user.lastRecommendDate || user.lastRecommendDate < today) {
+    currentCount = 0;
+  }
+
+  if (currentCount >= MAX_DAILY_RECOMMENDS) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  // Sayacı artır
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      dailyRecommendCount: currentCount + 1,
+      lastRecommendDate: new Date(),
+    },
+  });
+
+  return { allowed: true, remaining: MAX_DAILY_RECOMMENDS - currentCount - 1 };
 }
 
 export interface RecommendResult {

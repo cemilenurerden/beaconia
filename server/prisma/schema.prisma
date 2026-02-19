@@ -68,8 +68,10 @@ model User {
   city              String?
   preferences       Json?
   isPremium         Boolean           @default(false)
-  dailyRefreshCount Int               @default(0)
-  lastRefreshDate   DateTime?
+  dailyRefreshCount    Int               @default(0)
+  lastRefreshDate      DateTime?
+  dailyRecommendCount  Int               @default(0)
+  lastRecommendDate    DateTime?
   createdAt         DateTime          @default(now())
   decisions         DecisionHistory[]
   favorites         Favorite[]
