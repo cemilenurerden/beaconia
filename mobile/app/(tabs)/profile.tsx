@@ -1,13 +1,27 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth';
+import { useProfile } from '../../src/hooks/useProfile';
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Fitness: '#7C3AED',
+  Wellness: '#3B82F6',
+  Sosyal: '#059669',
+  Yaratici: '#F97316',
+  Egitim: '#F59E0B',
+};
+
+function getCategoryColor(category: string): string {
+  return CATEGORY_COLORS[category] ?? '#7C3AED';
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const { analysis, loading } = useProfile();
 
   const handleLogout = () => {
     logout();
@@ -16,37 +30,157 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <View className="px-6 pt-4 pb-2">
-        <Text className="text-2xl font-bold text-gray-900">Profil</Text>
-      </View>
-
-      <View className="flex-1 px-6 pt-6">
-        {/* Avatar ve kullanıcı bilgisi */}
-        <View className="items-center mb-8">
-          <View className="w-20 h-20 rounded-full bg-blue-500 items-center justify-center mb-3">
-            <Text className="text-white font-bold text-2xl">
-              {user?.name?.charAt(0).toUpperCase() ?? 'K'}
-            </Text>
-          </View>
-          <Text className="text-lg font-bold text-gray-900">
-            {user?.name ?? 'Kullanıcı'}
-          </Text>
-          <Text className="text-sm text-gray-400">{user?.email}</Text>
-        </View>
-
-        {/* Çıkış butonu */}
-        <View className="mt-auto pb-6">
-          <Pressable
-            onPress={handleLogout}
-            className="flex-row items-center justify-center rounded-2xl bg-red-50 py-4"
-          >
-            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-            <Text className="text-base font-semibold text-red-500 ml-2">
-              Çıkış Yap
-            </Text>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#111827" />
+          </Pressable>
+          <Text className="text-lg font-bold text-gray-900">Profil</Text>
+          <Pressable>
+            <Ionicons name="ellipsis-horizontal" size={24} color="#111827" />
           </Pressable>
         </View>
-      </View>
+
+        {/* Avatar + User Info */}
+        <View className="items-center mt-4 mb-6">
+          <View className="relative">
+            <View className="w-20 h-20 rounded-full bg-purple-500 items-center justify-center">
+              <Text className="text-white font-bold text-2xl">
+                {user?.name?.charAt(0).toUpperCase() ?? 'K'}
+              </Text>
+            </View>
+            <View className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-green-500 border-2 border-white" />
+          </View>
+          <Text className="text-lg font-bold text-gray-900 mt-3">
+            {user?.name ?? 'Kullanici'}
+          </Text>
+          {user?.isPremium ? (
+            <View className="flex-row items-center bg-purple-100 px-3 py-1 rounded-full mt-1">
+              <Text className="text-purple-600 font-semibold text-xs">Premium</Text>
+              <Text className="ml-1">&#10024;</Text>
+            </View>
+          ) : (
+            <View className="flex-row items-center bg-gray-100 px-3 py-1 rounded-full mt-1">
+              <Text className="text-gray-500 font-semibold text-xs">Ucretsiz</Text>
+            </View>
+          )}
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#7C3AED" className="mt-8" />
+        ) : (
+          <>
+            {/* Aktivite DNA Karti */}
+            <View className="mx-4 mb-4 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <View className="flex-row items-center mb-4">
+                <Ionicons name="analytics-outline" size={20} color="#7C3AED" />
+                <Text className="text-base font-bold text-gray-900 ml-2">Senin Aktivite DNA'n</Text>
+              </View>
+
+              {analysis.categoryDistribution.length > 0 ? (
+                analysis.categoryDistribution.slice(0, 5).map((cat) => (
+                  <View key={cat.category} className="mb-3">
+                    <View className="flex-row justify-between mb-1">
+                      <Text className="text-sm text-gray-700">{cat.category}</Text>
+                      <Text className="text-sm font-semibold text-gray-900">%{cat.percentage}</Text>
+                    </View>
+                    <View className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <View
+                        className="h-2 rounded-full"
+                        style={{
+                          width: `${cat.percentage}%`,
+                          backgroundColor: getCategoryColor(cat.category),
+                        }}
+                      />
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text className="text-sm text-gray-400 text-center py-2">Henuz aktivite verisi yok</Text>
+              )}
+
+              {/* Tercih Bilgileri */}
+              <View className="flex-row justify-between mt-4 pt-4 border-t border-gray-100">
+                <View className="items-center flex-1">
+                  <Text className="text-xs text-gray-400 mb-1">ENERJI</Text>
+                  <Text className="text-sm font-semibold text-gray-900">{analysis.topEnergy}</Text>
+                </View>
+                <View className="items-center flex-1">
+                  <Text className="text-xs text-gray-400 mb-1">MEKAN</Text>
+                  <Text className="text-sm font-semibold text-gray-900">{analysis.topLocation}</Text>
+                </View>
+                <View className="items-center flex-1">
+                  <Text className="text-xs text-gray-400 mb-1">SOSYAL</Text>
+                  <Text className="text-sm font-semibold text-gray-900">{analysis.topSocial}</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Mod Gecmisi */}
+            <View className="mx-4 mb-4 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <Text className="text-base font-bold text-gray-900 mb-3">Mod Gecmisi</Text>
+              {analysis.topMoods.length > 0 ? (
+                <View className="flex-row justify-center gap-3">
+                  {analysis.topMoods.map((mood, i) => (
+                    <View
+                      key={i}
+                      className="w-12 h-12 rounded-full bg-purple-50 items-center justify-center"
+                    >
+                      <Text className="text-xl">{mood}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text className="text-sm text-gray-400 text-center py-2">Henuz mod verisi yok</Text>
+              )}
+            </View>
+
+            {/* Istatistik Kartlari - 2x2 Grid */}
+            <View className="mx-4 mb-4">
+              <View className="flex-row gap-3 mb-3">
+                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                  <Ionicons name="checkmark-circle-outline" size={22} color="#7C3AED" />
+                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.totalActivities}</Text>
+                  <Text className="text-xs text-gray-400 mt-1">Toplam Aktivite</Text>
+                </View>
+                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                  <Ionicons name="flame-outline" size={22} color="#F97316" />
+                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.longestStreak}</Text>
+                  <Text className="text-xs text-gray-400 mt-1">En Uzun Seri (Gun)</Text>
+                </View>
+              </View>
+              <View className="flex-row gap-3">
+                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                  <Ionicons name="heart-outline" size={22} color="#EF4444" />
+                  <Text className="text-2xl font-bold text-gray-900 mt-2">
+                    {analysis.favoriteActivity || '-'}
+                  </Text>
+                  <Text className="text-xs text-gray-400 mt-1">Favori</Text>
+                </View>
+                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                  <Ionicons name="time-outline" size={22} color="#3B82F6" />
+                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.weeklyHours}</Text>
+                  <Text className="text-xs text-gray-400 mt-1">Bu Hafta (Saat)</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Cikis Butonu */}
+            <View className="mx-4 mb-8">
+              <Pressable
+                onPress={handleLogout}
+                className="flex-row items-center justify-center rounded-2xl bg-red-50 py-4"
+              >
+                <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+                <Text className="text-base font-semibold text-red-500 ml-2">
+                  Cikis Yap
+                </Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

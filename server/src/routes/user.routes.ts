@@ -16,5 +16,6 @@ router.put(
   validateBody(preferencesSchema),
   userController.updatePreferences as unknown as RequestHandler
 );
+router.get('/profile-analysis', userController.getProfileAnalysis as unknown as RequestHandler);
 
 export default router;

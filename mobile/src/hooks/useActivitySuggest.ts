@@ -78,8 +78,8 @@ export function useActivitySuggest() {
       }
       setPhase('result');
     } catch (error: any) {
-      // Backend'den refresh limit hatası gelirse premium sayfasına yönlendir
-      if (error.code === 'REFRESH_LIMIT') {
+      // Backend'den limit hatası gelirse premium sayfasına yönlendir
+      if (error.code === 'REFRESH_LIMIT' || error.code === 'RECOMMEND_LIMIT') {
         setPhase('result');
         router.push('/premium');
         return;
