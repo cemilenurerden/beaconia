@@ -67,7 +67,7 @@ export default function VerifyResetCodeScreen() {
       <View className="flex-row justify-center">
         <Text className="text-sm text-gray-400">Kod gelmedi mi? </Text>
         <Pressable onPress={handleResend} disabled={resending}>
-          <Text className="text-sm font-semibold text-blue-500">
+          <Text className="text-sm font-semibold text-indigo-600">
             {resending ? 'Gönderiliyor...' : 'Tekrar Gönder'}
           </Text>
         </Pressable>

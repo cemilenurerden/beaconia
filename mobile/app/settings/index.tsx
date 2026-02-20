@@ -37,7 +37,7 @@ function SettingsRow({
       <Ionicons
         name={icon as any}
         size={20}
-        color={danger ? '#EF4444' : '#7C3AED'}
+        color={danger ? '#EF4444' : '#4F46E5'}
         style={{ marginRight: 12 }}
       />
       <Text
@@ -81,14 +81,27 @@ export default function SettingsScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.push('/(tabs)/profile')}>
           <Ionicons name="arrow-back" size={24} color="#111827" />
         </Pressable>
-        <Text className="text-lg font-bold text-gray-900">Ayarlar</Text>
+        <Text className="text-2xl font-bold text-gray-900">Ayarlar</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Premium */}
+        <SectionHeader title="Üyelik" />
+        <View
+          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
+        >
+          <SettingsRow
+            icon="star-outline"
+            label="Premium'a Geç"
+            onPress={() => router.push('/premium')}
+          />
+        </View>
+
         {/* Profil Ayarları */}
         <SectionHeader title="Profil Ayarları" />
         <View
@@ -130,13 +143,18 @@ export default function SettingsScreen() {
             onPress={() => router.push('/settings/notifications')}
           />
           <SettingsRow
+            icon="language-outline"
+            label="Dil"
+            onPress={() => router.push('/settings/language')}
+          />
+          <SettingsRow
             icon="moon-outline"
             label="Dark Mode"
             rightElement={
               <Switch
                 value={darkModeEnabled}
                 onValueChange={toggleDarkMode}
-                trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
+                trackColor={{ false: '#E5E7EB', true: '#4F46E5' }}
                 thumbColor="#ffffff"
               />
             }

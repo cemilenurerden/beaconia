@@ -55,7 +55,7 @@ export default function RegisterScreen() {
         <>
           <Text className="text-sm text-gray-400">Zaten bir hesabın var mı? </Text>
           <Pressable onPress={() => router.back()}>
-            <Text className="text-sm font-semibold text-blue-500">Giriş Yap</Text>
+            <Text className="text-sm font-semibold text-indigo-600">Giriş Yap</Text>
           </Pressable>
         </>
       }

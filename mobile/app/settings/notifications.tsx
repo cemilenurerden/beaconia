@@ -30,13 +30,13 @@ function NotificationRow({
       className="flex-row items-center px-4 py-3.5 border-b border-gray-50"
       style={{ opacity: disabled ? 0.4 : 1 }}
     >
-      <Ionicons name={icon as any} size={20} color="#7C3AED" style={{ marginRight: 12 }} />
+      <Ionicons name={icon as any} size={20} color="#4F46E5" style={{ marginRight: 12 }} />
       <Text className="flex-1 text-sm font-medium text-gray-800">{label}</Text>
       <Switch
         value={value}
         onValueChange={onToggle}
         disabled={disabled}
-        trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
+        trackColor={{ false: '#E5E7EB', true: '#4F46E5' }}
         thumbColor="#ffffff"
       />
     </View>

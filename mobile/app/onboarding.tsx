@@ -56,7 +56,8 @@ export default function OnboardingScreen() {
         <View className="mt-16 w-full">
           <Pressable
             onPress={handleNext}
-            className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-blue-500 py-4"
+            className="w-full flex-row items-center justify-center gap-2 rounded-2xl py-4"
+            style={{ backgroundColor: '#4F46E5' }}
           >
             <Ionicons name="arrow-forward-circle" size={22} color="white" />
             <Text className="text-base font-semibold text-white">

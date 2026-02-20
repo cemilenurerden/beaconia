@@ -68,7 +68,7 @@ export default function ActivitySuggestScreen() {
             <Text className="text-xs font-bold text-gray-500 tracking-wider">
               NE KADAR VAKTİN VAR?
             </Text>
-            <View className="bg-blue-500 rounded-xl px-3 py-1">
+            <View className="bg-indigo-600 rounded-xl px-3 py-1">
               <Text className="text-white font-bold text-sm">{duration} dk</Text>
             </View>
           </View>
@@ -78,9 +78,9 @@ export default function ActivitySuggestScreen() {
             step={5}
             value={duration}
             onValueChange={(v) => setDuration(Math.round(v))}
-            minimumTrackTintColor="#3B82F6"
+            minimumTrackTintColor="#4F46E5"
             maximumTrackTintColor="#E5E7EB"
-            thumbTintColor="#3B82F6"
+            thumbTintColor="#4F46E5"
           />
           <View className="flex-row justify-between mt-1">
             <Text className="text-xs text-gray-400">10 dk</Text>
@@ -129,8 +129,8 @@ export default function ActivitySuggestScreen() {
         </View>
 
         {/* Konum */}
-        <View className="mb-8 flex-row items-center bg-blue-50 rounded-2xl p-4">
-          <View className="w-10 h-10 rounded-xl bg-blue-500 items-center justify-center">
+        <View className="mb-8 flex-row items-center bg-indigo-50 rounded-2xl p-4">
+          <View className="w-10 h-10 rounded-xl bg-indigo-600 items-center justify-center">
             <Ionicons name="home" size={20} color="white" />
           </View>
           <View className="flex-1 ml-3">
@@ -140,7 +140,7 @@ export default function ActivitySuggestScreen() {
           <Switch
             value={isHome}
             onValueChange={setIsHome}
-            trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
+            trackColor={{ false: '#D1D5DB', true: '#4F46E5' }}
             thumbColor="white"
           />
         </View>
@@ -164,8 +164,8 @@ export default function ActivitySuggestScreen() {
                     paddingVertical: 16,
                     borderRadius: 16,
                     borderWidth: 1,
-                    backgroundColor: isSelected ? '#3B82F6' : '#FFFFFF',
-                    borderColor: isSelected ? '#3B82F6' : '#E5E7EB',
+                    backgroundColor: isSelected ? '#4F46E5' : '#FFFFFF',
+                    borderColor: isSelected ? '#4F46E5' : '#E5E7EB',
                   }}
                 >
                   <Text
@@ -194,9 +194,9 @@ export default function ActivitySuggestScreen() {
         </View>
 
         {/* Yalnız mısın? */}
-        <View className="mb-8 flex-row items-center bg-blue-50 rounded-2xl p-4">
-          <View className="w-10 h-10 rounded-xl bg-blue-200 items-center justify-center">
-            <Ionicons name="people" size={20} color="#3B82F6" />
+        <View className="mb-8 flex-row items-center bg-indigo-50 rounded-2xl p-4">
+          <View className="w-10 h-10 rounded-xl bg-indigo-200 items-center justify-center">
+            <Ionicons name="people" size={20} color="#4F46E5" />
           </View>
           <View className="flex-1 ml-3">
             <Text className="text-base font-semibold text-gray-900">Yalnız mısın?</Text>
@@ -205,7 +205,7 @@ export default function ActivitySuggestScreen() {
           <Switch
             value={isAlone}
             onValueChange={setIsAlone}
-            trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
+            trackColor={{ false: '#D1D5DB', true: '#4F46E5' }}
             thumbColor="white"
           />
         </View>
@@ -229,7 +229,7 @@ export default function ActivitySuggestScreen() {
                     paddingVertical: 10,
                     paddingHorizontal: 14,
                     borderRadius: 20,
-                    backgroundColor: isSelected ? '#3B82F6' : '#F3F4F6',
+                    backgroundColor: isSelected ? '#4F46E5' : '#F3F4F6',
                   }}
                 >
                   <Text style={{ fontSize: 16, marginRight: 6 }}>{opt.emoji}</Text>
@@ -285,7 +285,7 @@ export default function ActivitySuggestScreen() {
             justifyContent: 'center',
             borderRadius: 16,
             paddingVertical: 20,
-            backgroundColor: '#3B82F6',
+            backgroundColor: '#4F46E5',
           }}
         >
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginRight: 8 }}>

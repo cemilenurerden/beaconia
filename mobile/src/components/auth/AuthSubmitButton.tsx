@@ -22,7 +22,8 @@ export function AuthSubmitButton({
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
-      className={`flex-row items-center justify-center rounded-2xl bg-blue-500 py-4 ${className}`}
+      className={`flex-row items-center justify-center rounded-2xl py-4 ${className}`}
+      style={{ backgroundColor: '#4F46E5' }}
     >
       {loading ? (
         <ActivityIndicator color="white" />

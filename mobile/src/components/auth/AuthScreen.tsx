@@ -20,8 +20,8 @@ export function AuthScreen({ navTitle, headerTitle, headerSubtitle, error, child
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Sol ve sağ mavi border efekti */}
-      <View className="absolute left-0 top-0 bottom-0 w-1 bg-blue-200" />
-      <View className="absolute right-0 top-0 bottom-0 w-1 bg-blue-200" />
+      <View className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-200" />
+      <View className="absolute right-0 top-0 bottom-0 w-1 bg-indigo-200" />
 
       {/* Header */}
       <View className="flex-row items-center px-5 py-3">

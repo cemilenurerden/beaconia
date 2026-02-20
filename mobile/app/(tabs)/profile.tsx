@@ -1,20 +1,22 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '../../src/store/auth';
 import { useProfile } from '../../src/hooks/useProfile';
+import { useSettingsStore } from '../../src/store/settings';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Fitness: '#7C3AED',
-  Wellness: '#3B82F6',
+  Fitness: '#4F46E5',
+  Wellness: '#818CF8',
   Sosyal: '#059669',
   Yaratici: '#F97316',
   Egitim: '#F59E0B',
 };
 
 function getCategoryColor(category: string): string {
-  return CATEGORY_COLORS[category] ?? '#7C3AED';
+  return CATEGORY_COLORS[category] ?? '#4F46E5';
 }
 
 export default function ProfileScreen() {
@@ -22,10 +24,26 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const { analysis, loading } = useProfile();
+  const profilePhoto = useSettingsStore((s) => s.profilePhoto);
+  const setProfilePhoto = useSettingsStore((s) => s.setProfilePhoto);
 
   const handleLogout = () => {
     logout();
     router.replace('/(auth)/login');
+  };
+
+  const handlePickPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setProfilePhoto(result.assets[0].uri);
+    }
   };
 
   return (
@@ -33,31 +51,65 @@ export default function ProfileScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
-          <Pressable onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#111827" />
-          </Pressable>
-          <Text className="text-lg font-bold text-gray-900">Profil</Text>
+          <View style={{ width: 22 }} />
+          <Text className="text-2xl font-bold text-gray-900">Profil</Text>
           <Pressable onPress={() => router.push('/settings')}>
-            <Ionicons name="settings-outline" size={24} color="#111827" />
+            <Ionicons name="settings-outline" size={22} color="#9CA3AF" />
           </Pressable>
         </View>
 
         {/* Avatar + User Info */}
         <View className="items-center mt-4 mb-6">
-          <View className="relative">
-            <View className="w-20 h-20 rounded-full bg-purple-500 items-center justify-center">
-              <Text className="text-white font-bold text-2xl">
-                {user?.name?.charAt(0).toUpperCase() ?? 'K'}
-              </Text>
+          <Pressable onPress={handlePickPhoto} style={{ position: 'relative' }}>
+            <View style={{
+              width: 88,
+              height: 88,
+              borderRadius: 44,
+              borderWidth: 3,
+              borderColor: '#4F46E5',
+              padding: 3,
+            }}>
+              {profilePhoto ? (
+                <Image
+                  source={{ uri: profilePhoto }}
+                  style={{ width: '100%', height: '100%', borderRadius: 40 }}
+                />
+              ) : (
+                <View style={{
+                  flex: 1,
+                  borderRadius: 40,
+                  backgroundColor: '#4F46E5',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 28 }}>
+                    {user?.name?.charAt(0).toUpperCase() ?? 'K'}
+                  </Text>
+                </View>
+              )}
             </View>
-            <View className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-green-500 border-2 border-white" />
-          </View>
+            <View style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 26,
+              height: 26,
+              borderRadius: 13,
+              backgroundColor: '#4F46E5',
+              borderWidth: 2,
+              borderColor: '#fff',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <Ionicons name="camera" size={13} color="#fff" />
+            </View>
+          </Pressable>
           <Text className="text-lg font-bold text-gray-900 mt-3">
             {user?.name ?? 'Kullanici'}
           </Text>
           {user?.isPremium ? (
-            <View className="flex-row items-center bg-purple-100 px-3 py-1 rounded-full mt-1">
-              <Text className="text-purple-600 font-semibold text-xs">Premium</Text>
+            <View className="flex-row items-center bg-indigo-100 px-3 py-1 rounded-full mt-1">
+              <Text className="text-indigo-600 font-semibold text-xs">Premium</Text>
               <Text className="ml-1">&#10024;</Text>
             </View>
           ) : (
@@ -68,13 +120,13 @@ export default function ProfileScreen() {
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#7C3AED" className="mt-8" />
+          <ActivityIndicator size="large" color="#4F46E5" className="mt-8" />
         ) : (
           <>
             {/* Aktivite DNA Karti */}
             <View className="mx-4 mb-4 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
               <View className="flex-row items-center mb-4">
-                <Ionicons name="analytics-outline" size={20} color="#7C3AED" />
+                <Ionicons name="analytics-outline" size={20} color="#4F46E5" />
                 <Text className="text-base font-bold text-gray-900 ml-2">Senin Aktivite DNA'n</Text>
               </View>
 
@@ -125,7 +177,7 @@ export default function ProfileScreen() {
                   {analysis.topMoods.map((mood, i) => (
                     <View
                       key={i}
-                      className="w-12 h-12 rounded-full bg-purple-50 items-center justify-center"
+                      className="w-12 h-12 rounded-full bg-indigo-50 items-center justify-center"
                     >
                       <Text className="text-xl">{mood}</Text>
                     </View>
@@ -140,7 +192,7 @@ export default function ProfileScreen() {
             <View className="mx-4 mb-4">
               <View className="flex-row gap-3 mb-3">
                 <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
-                  <Ionicons name="checkmark-circle-outline" size={22} color="#7C3AED" />
+                  <Ionicons name="checkmark-circle-outline" size={22} color="#4F46E5" />
                   <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.totalActivities}</Text>
                   <Text className="text-xs text-gray-400 mt-1">Toplam Aktivite</Text>
                 </View>
@@ -159,7 +211,7 @@ export default function ProfileScreen() {
                   <Text className="text-xs text-gray-400 mt-1">Favori</Text>
                 </View>
                 <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
-                  <Ionicons name="time-outline" size={22} color="#3B82F6" />
+                  <Ionicons name="time-outline" size={22} color="#4F46E5" />
                   <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.weeklyHours}</Text>
                   <Text className="text-xs text-gray-400 mt-1">Bu Hafta (Saat)</Text>
                 </View>
@@ -167,15 +219,16 @@ export default function ProfileScreen() {
             </View>
 
             {/* Cikis Butonu */}
-            <View className="mx-4 mb-8">
+            <View className="mx-4 mb-8" style={{ borderRadius: 16, overflow: 'hidden' }}>
               <Pressable
                 onPress={handleLogout}
-                className="flex-row items-center justify-center rounded-2xl bg-red-50 py-4"
+                android_ripple={{ color: '#dc2626' }}
+                style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
               >
-                <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-                <Text className="text-base font-semibold text-red-500 ml-2">
-                  Cikis Yap
-                </Text>
+                <View style={{ backgroundColor: '#F87171', borderRadius: 16, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="log-out-outline" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+                  <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: '600' }}>Çıkış Yap</Text>
+                </View>
               </Pressable>
             </View>
           </>

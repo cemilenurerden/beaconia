@@ -37,7 +37,7 @@ export default function ForgotPasswordScreen() {
       error={error}
       footer={
         <Pressable onPress={() => router.back()}>
-          <Text className="text-sm font-semibold text-blue-500">Giriş Ekranına Dön</Text>
+          <Text className="text-sm font-semibold text-indigo-600">Giriş Ekranına Dön</Text>
         </Pressable>
       }
     >

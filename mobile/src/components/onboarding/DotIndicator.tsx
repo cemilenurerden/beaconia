@@ -11,9 +11,8 @@ export function DotIndicator({ total, activeIndex }: DotIndicatorProps) {
       {Array.from({ length: total }, (_, i) => (
         <View
           key={i}
-          className={`h-2.5 rounded-full ${
-            i === activeIndex ? 'w-8 bg-blue-500' : 'w-2.5 bg-gray-300'
-          }`}
+          className={`h-2.5 rounded-full ${i === activeIndex ? 'w-8' : 'w-2.5'}`}
+          style={{ backgroundColor: i === activeIndex ? '#4F46E5' : '#D1D5DB' }}
         />
       ))}
     </View>

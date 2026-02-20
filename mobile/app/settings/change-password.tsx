@@ -65,7 +65,7 @@ export default function ChangePasswordScreen() {
         <Pressable
           onPress={handleSave}
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-          className="mt-2 bg-purple-600 rounded-xl py-4 items-center"
+          className="mt-2 bg-indigo-600 rounded-xl py-4 items-center"
         >
           <Text className="text-white font-semibold text-base">Kaydet</Text>
         </Pressable>

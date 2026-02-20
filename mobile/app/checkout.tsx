@@ -60,12 +60,12 @@ export default function CheckoutScreen() {
           <View style={{
             backgroundColor: colors.slate800, borderRadius: 16, padding: 20,
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 28, borderWidth: 1, borderColor: '#7C3AED44',
+            marginBottom: 28, borderWidth: 1, borderColor: '#4F46E544',
           }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{
                 width: 44, height: 44, borderRadius: 22,
-                backgroundColor: '#7C3AED22', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: '#4F46E522', alignItems: 'center', justifyContent: 'center',
               }}>
                 <Ionicons name="diamond" size={22} color={colors.purpleMid} />
               </View>

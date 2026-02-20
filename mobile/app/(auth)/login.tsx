@@ -52,7 +52,7 @@ export default function LoginScreen() {
         <>
           <Text className="text-sm text-gray-400">Henüz hesabın yok mu? </Text>
           <Pressable onPress={() => router.push('/(auth)/register')}>
-            <Text className="text-sm font-semibold text-blue-500">Kayıt Ol</Text>
+            <Text className="text-sm font-semibold text-indigo-600">Kayıt Ol</Text>
           </Pressable>
         </>
       }
