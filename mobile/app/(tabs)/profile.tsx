@@ -37,8 +37,8 @@ export default function ProfileScreen() {
             <Ionicons name="arrow-back" size={24} color="#111827" />
           </Pressable>
           <Text className="text-lg font-bold text-gray-900">Profil</Text>
-          <Pressable>
-            <Ionicons name="ellipsis-horizontal" size={24} color="#111827" />
+          <Pressable onPress={() => router.push('/settings')}>
+            <Ionicons name="settings-outline" size={24} color="#111827" />
           </Pressable>
         </View>
 
