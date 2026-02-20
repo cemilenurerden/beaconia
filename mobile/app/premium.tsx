@@ -12,7 +12,7 @@ function FeatureCard({ icon, title, desc }: { icon: keyof typeof Ionicons.glyphM
     }}>
       <View style={{
         width: 48, height: 48, borderRadius: 14,
-        backgroundColor: '#7C3AED22', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#4F46E522', alignItems: 'center', justifyContent: 'center',
       }}>
         <Ionicons name={icon} size={24} color={colors.purpleMid} />
       </View>

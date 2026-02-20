@@ -17,15 +17,15 @@ export const colors = {
   slate400: '#94A3B8',
   slate300: '#CBD5E1',
 
-  // Primary (purple)
-  purple: '#7C3AED',
-  purpleLight: '#EDE9FE',
-  purplePale: '#DDD6FE',
-  purpleMid: '#A78BFA',
+  // Primary (indigo)
+  purple: '#4F46E5',
+  purpleLight: '#EEF2FF',
+  purplePale: '#E0E7FF',
+  purpleMid: '#818CF8',
 
   // Blue
-  blue: '#3B82F6',
-  blueLight: '#DBEAFE',
+  blue: '#4F46E5',
+  blueLight: '#EEF2FF',
 
   // Green
   green: '#059669',

@@ -68,7 +68,7 @@ export default function LoadingScreen() {
             backgroundColor: '#FFFFFF',
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#7C3AED',
+            shadowColor: '#4F46E5',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.2,
             shadowRadius: 12,

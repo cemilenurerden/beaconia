@@ -73,7 +73,7 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
         {/* Reason Card */}
         <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-            <Ionicons name="sparkles" size={20} color="#7C3AED" />
+            <Ionicons name="sparkles" size={20} color="#4F46E5" />
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#111827', marginLeft: 8 }}>Neden bu?</Text>
           </View>
           <View style={{ backgroundColor: '#FFFFFF', borderRadius: 18, padding: 22, minHeight: 100, borderWidth: 1, borderColor: '#E5E7EB' }}>
@@ -102,11 +102,11 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name="swap-horizontal" size={20} color="#7C3AED" />
+                  <Ionicons name="swap-horizontal" size={20} color="#4F46E5" />
                 </View>
                 <View style={{ marginLeft: 12 }}>
                   <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827' }}>Plan B</Text>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#7C3AED', letterSpacing: 0.5 }}>ALTERNATİF SEÇENEK</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#4F46E5', letterSpacing: 0.5 }}>ALTERNATİF SEÇENEK</Text>
                 </View>
               </View>
               <Ionicons name={showPlanB ? 'chevron-up' : 'chevron-down'} size={22} color="#6B7280" />
@@ -116,7 +116,7 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
             {showPlanB && (
               <View style={{ marginTop: 16 }}>
                 <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 18, borderWidth: 1, borderColor: '#E2E8F0' }}>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#7C3AED', marginBottom: 8 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#4F46E5', marginBottom: 8 }}>
                     Enerjine daha uygun alternatif:
                   </Text>
                   <Text style={{ fontSize: 18, fontWeight: '700', color: '#111827', lineHeight: 26 }}>
@@ -191,7 +191,7 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
             {/* Icon */}
             <View style={{ alignItems: 'center', marginBottom: 16 }}>
               <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="bulb" size={24} color="#7C3AED" />
+                <Ionicons name="bulb" size={24} color="#4F46E5" />
               </View>
             </View>
 
@@ -216,10 +216,10 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
                       paddingHorizontal: 18, paddingVertical: 12, borderRadius: 24,
                       borderWidth: 1.5,
                       backgroundColor: isSelected ? '#EDE9FE' : '#FFFFFF',
-                      borderColor: isSelected ? '#7C3AED' : '#E5E7EB',
+                      borderColor: isSelected ? '#4F46E5' : '#E5E7EB',
                     }}
                   >
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: isSelected ? '#7C3AED' : '#374151' }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: isSelected ? '#4F46E5' : '#374151' }}>
                       {r} {isSelected ? '✕' : ''}
                     </Text>
                   </TouchableOpacity>

@@ -21,31 +21,21 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
       {/* Header */}
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 24,
-        paddingTop: 16,
-        paddingBottom: 8,
-      }}>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: '#111827' }}>
-          Etkinliklerim
-        </Text>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Ionicons name="settings-outline" size={22} color="#9CA3AF" />
-        </TouchableOpacity>
+      <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
+        <View style={{ width: 22 }} />
+        <Text className="text-2xl font-bold text-gray-900">Etkinliklerim</Text>
+        <Ionicons name="calendar-outline" size={22} color="#9CA3AF" />
       </View>
 
       {/* Tab Switcher */}
-      <View style={{ paddingHorizontal: 24, marginTop: 8, marginBottom: 16 }}>
+      <View style={{ paddingHorizontal: 24, marginTop: 32, marginBottom: 16 }}>
         <TabSwitcher tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
       </View>
 
       {/* Content */}
       {loading ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#7C3AED" />
+          <ActivityIndicator size="large" color="#4F46E5" />
         </View>
       ) : activeTab === 'history' ? (
         decisions.length === 0 ? (

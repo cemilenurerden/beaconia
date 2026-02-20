@@ -6,11 +6,15 @@ interface SettingsState {
   notifyActivitySuggestions: boolean;
   notifyReminders: boolean;
   notifyAppNews: boolean;
+  profilePhoto: string | null;
+  language: 'tr' | 'en';
   toggleNotifications: () => void;
   toggleDarkMode: () => void;
   toggleActivitySuggestions: () => void;
   toggleReminders: () => void;
   toggleAppNews: () => void;
+  setProfilePhoto: (uri: string | null) => void;
+  setLanguage: (lang: 'tr' | 'en') => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -19,6 +23,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   notifyActivitySuggestions: true,
   notifyReminders: true,
   notifyAppNews: false,
+  profilePhoto: null,
+  language: 'tr',
   toggleNotifications: () =>
     set((state) => ({ notificationsEnabled: !state.notificationsEnabled })),
   toggleDarkMode: () =>
@@ -29,4 +35,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     set((state) => ({ notifyReminders: !state.notifyReminders })),
   toggleAppNews: () =>
     set((state) => ({ notifyAppNews: !state.notifyAppNews })),
+  setProfilePhoto: (uri) => set({ profilePhoto: uri }),
+  setLanguage: (lang) => set({ language: lang }),
 }));

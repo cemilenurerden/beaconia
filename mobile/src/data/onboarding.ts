@@ -19,7 +19,7 @@ export const onboardingPages: OnboardingItem[] = [
     description:
       'Hayatındaki ikilemleri topluluğumuza paylaş, en doğru kararı saniyeler içinde ver.',
     buttonText: 'Başlamak için kaydır',
-    gradient: ['#60A5FA', '#3B82F6'],
+    gradient: ['#60A5FA', '#4F46E5'],
     iconColor: '#DBEAFE',
   },
   {
@@ -29,7 +29,7 @@ export const onboardingPages: OnboardingItem[] = [
     description:
       'Kafa karışıklığına yer yok. Sana özel net bir öneri sunuyoruz.',
     buttonText: 'Devam et',
-    gradient: ['#60A5FA', '#3B82F6'],
+    gradient: ['#60A5FA', '#4F46E5'],
     iconColor: '#DBEAFE',
   },
   {
@@ -39,7 +39,7 @@ export const onboardingPages: OnboardingItem[] = [
     description:
       'Zamanını, bütçeni ve enerjini belirle, gerisini bize bırak. İlk adımı beraber atalım.',
     buttonText: 'Hadi Başlayalım',
-    gradient: ['#60A5FA', '#3B82F6'],
+    gradient: ['#60A5FA', '#4F46E5'],
     iconColor: '#DBEAFE',
   },
 ];
