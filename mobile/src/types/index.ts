@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   city: string | null;
+  profilePhoto: string | null;
   isPremium: boolean;
   createdAt: string;
 }

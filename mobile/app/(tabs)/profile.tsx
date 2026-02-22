@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '../../src/store/auth';
 import { useProfile } from '../../src/hooks/useProfile';
 import { useSettingsStore } from '../../src/store/settings';
+import { api } from '../../src/api/client';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Fitness: '#4F46E5',
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
   const { analysis, loading } = useProfile();
   const profilePhoto = useSettingsStore((s) => s.profilePhoto);
   const setProfilePhoto = useSettingsStore((s) => s.setProfilePhoto);
+  const setUserProfilePhoto = useAuthStore((s) => s.setUserProfilePhoto);
 
   const handleLogout = () => {
     logout();
@@ -42,7 +44,19 @@ export default function ProfileScreen() {
       quality: 0.8,
     });
     if (!result.canceled) {
-      setProfilePhoto(result.assets[0].uri);
+      const localUri = result.assets[0].uri;
+      setProfilePhoto(localUri); // hemen göster
+      try {
+        const data = await api.uploadPhoto<{ profilePhoto: string }>(
+          '/user/profile-photo',
+          localUri
+        );
+        setProfilePhoto(data.profilePhoto);
+        setUserProfilePhoto(data.profilePhoto);
+      } catch (err: any) {
+        Alert.alert('Hata', err?.message ?? 'Fotoğraf yüklenemedi. Tekrar deneyin.');
+        setProfilePhoto(null);
+      }
     }
   };
 
