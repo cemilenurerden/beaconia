@@ -1,4 +1,7 @@
+import * as argon2 from 'argon2';
 import { prisma } from '../utils/prisma.js';
+import { ApiError } from '../types/index.js';
+import type { UpdateProfileInput, ChangePasswordInput } from '../validators/user.validator.js';
 
 export interface UserStats {
   dailyCompleted: number;
@@ -251,9 +254,51 @@ export async function updatePreferences(
   return user.preferences as unknown as UserPreferences;
 }
 
+
 export async function updateProfilePhoto(userId: string, photoUrl: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: { profilePhoto: photoUrl },
   });
 }
+
+export async function updateProfile(
+  userId: string,
+  input: UpdateProfileInput
+): Promise<{ id: string; name: string; email: string; city: string | null; profilePhoto: string | null }> {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.city !== undefined && { city: input.city }),
+    },
+    select: { id: true, name: true, email: true, city: true, profilePhoto: true },
+  });
+  return user;
+}
+
+export async function changePassword(
+  userId: string,
+  input: ChangePasswordInput
+): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true },
+  });
+
+  if (!user) throw new ApiError(404, 'NOT_FOUND', 'Kullanıcı bulunamadı.');
+
+  const isValid = await argon2.verify(user.passwordHash, input.currentPassword);
+  if (!isValid) throw new ApiError(400, 'INVALID_PASSWORD', 'Mevcut şifre yanlış.');
+
+  const passwordHash = await argon2.hash(input.newPassword);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash },
+  });
+}
+
+export async function deleteAccount(userId: string): Promise<void> {
+  await prisma.user.delete({ where: { id: userId } });
+}
+

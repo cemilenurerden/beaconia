@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { UserStats, UserPreferences, ProfileAnalysis } from '../types';
+import type { UserStats, UserPreferences, ProfileAnalysis, User } from '../types';
 
 export function getStats() {
   return api.get<UserStats>('/user/stats');
@@ -15,4 +15,16 @@ export function updatePreferences(preferences: UserPreferences) {
 
 export function getProfileAnalysis() {
   return api.get<ProfileAnalysis>('/user/profile-analysis');
+}
+
+export function updateProfile(data: { name?: string; city?: string | null }) {
+  return api.put<Pick<User, 'id' | 'name' | 'email' | 'city' | 'profilePhoto'>>('/user/profile', data);
+}
+
+export function changePassword(data: { currentPassword: string; newPassword: string }) {
+  return api.put<{ message: string }>('/user/password', data);
+}
+
+export function deleteAccount() {
+  return api.delete<{ message: string }>('/user/account');
 }

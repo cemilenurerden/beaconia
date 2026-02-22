@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useSettingsStore } from '../../src/store/settings';
 import { useAuthStore } from '../../src/store/auth';
+import { deleteAccount } from '../../src/api/user';
 
 function SectionHeader({ title }: { title: string }) {
   return (
@@ -57,16 +58,26 @@ export default function SettingsScreen() {
   const darkModeEnabled = useSettingsStore((s) => s.darkModeEnabled);
   const toggleDarkMode = useSettingsStore((s) => s.toggleDarkMode);
 
+  const logout = useAuthStore((s) => s.logout);
+
   const handleDeleteAccount = () => {
     Alert.alert(
       'Hesabı Sil',
-      'Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+      'Tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz.',
       [
         { text: 'Vazgeç', style: 'cancel' },
         {
           text: 'Sil',
           style: 'destructive',
-          onPress: () => Alert.alert('Yakında', 'Bu özellik yakında geliyor.'),
+          onPress: async () => {
+            try {
+              await deleteAccount();
+              logout();
+              router.replace('/(auth)/login');
+            } catch (err: any) {
+              Alert.alert('Hata', err?.message ?? 'Hesap silinemedi.');
+            }
+          },
         },
       ],
     );

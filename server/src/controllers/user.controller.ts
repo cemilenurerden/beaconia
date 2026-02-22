@@ -63,6 +63,48 @@ export async function getProfileAnalysis(
   }
 }
 
+export async function updateProfile(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const user = await userService.updateProfile(userId, req.body);
+    sendSuccess(res, user);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function changePassword(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    await userService.changePassword(userId, req.body);
+    sendSuccess(res, { message: 'Şifre başarıyla güncellendi.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteAccount(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    await userService.deleteAccount(userId);
+    sendSuccess(res, { message: 'Hesap silindi.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function uploadProfilePhoto(
   req: AuthRequest,
   res: Response,

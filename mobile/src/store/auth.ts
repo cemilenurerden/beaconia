@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import type { User } from '../types';
-import { useSettingsStore } from './settings';
 
 interface AuthState {
   token: string | null;
@@ -10,7 +9,10 @@ interface AuthState {
   login: (token: string, user: User) => void;
   logout: () => void;
   completeOnboarding: () => void;
+
   setUserProfilePhoto: (url: string) => void;
+  updateUser: (fields: Partial<Pick<User, 'name' | 'city'>>) => void;
+
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -18,14 +20,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   hasSeenOnboarding: false,
-  login: (token, user) => {
-    set({ token, user, isAuthenticated: true });
-    if (user.profilePhoto) {
-      useSettingsStore.getState().setProfilePhoto(user.profilePhoto);
-    }
-  },
+  login: (token, user) => set({ token, user, isAuthenticated: true }),
   logout: () => set({ token: null, user: null, isAuthenticated: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
   setUserProfilePhoto: (url) =>
     set((state) => ({ user: state.user ? { ...state.user, profilePhoto: url } : null })),
+  updateUser: (fields) =>
+    set((state) => ({ user: state.user ? { ...state.user, ...fields } : null })),
 }));

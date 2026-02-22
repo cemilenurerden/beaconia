@@ -1,22 +1,42 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth';
+import { updateProfile } from '../../src/api/user';
 
 export default function EditCityScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const [city, setCity] = useState((user as any)?.city ?? '');
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const [city, setCity] = useState(user?.city ?? '');
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    Alert.alert('Yakında', 'Bu özellik yakında geliyor.');
+  const handleSave = async () => {
+    const trimmed = city.trim();
+    if (trimmed.length > 0 && trimmed.length < 2) {
+      Alert.alert('Hata', 'Şehir en az 2 karakter olmalı.');
+      return;
+    }
+    if (trimmed === (user?.city ?? '')) {
+      router.back();
+      return;
+    }
+    setLoading(true);
+    try {
+      const updated = await updateProfile({ city: trimmed || null });
+      updateUser({ city: updated.city });
+      router.back();
+    } catch (err: any) {
+      Alert.alert('Hata', err?.message ?? 'Şehir güncellenemedi.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
         <Pressable onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#111827" />
@@ -32,16 +52,22 @@ export default function EditCityScreen() {
           onChangeText={setCity}
           placeholder="Şehrinizi girin"
           placeholderTextColor="#9CA3AF"
-          className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-gray-900"
+          className="bg-white rounded-xl px-4 py-4 text-sm text-gray-900"
+          style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
           autoFocus
+          maxLength={50}
         />
 
         <Pressable
           onPress={handleSave}
-          style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+          disabled={loading}
+          style={({ pressed }) => ({ opacity: pressed || loading ? 0.7 : 1 })}
           className="mt-6 bg-indigo-600 rounded-xl py-4 items-center"
         >
-          <Text className="text-white font-semibold text-base">Kaydet</Text>
+          {loading
+            ? <ActivityIndicator color="#fff" />
+            : <Text className="text-white font-semibold text-base">Kaydet</Text>
+          }
         </Pressable>
       </View>
     </SafeAreaView>

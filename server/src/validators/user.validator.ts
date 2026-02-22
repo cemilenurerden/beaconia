@@ -10,3 +10,17 @@ export const preferencesSchema = z.object({
 });
 
 export type PreferencesInput = z.infer<typeof preferencesSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, 'Ad en az 2 karakter olmalı').optional(),
+  city: z.string().min(2, 'Şehir en az 2 karakter olmalı').nullable().optional(),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Mevcut şifre gerekli'),
+  newPassword: z.string().min(6, 'Yeni şifre en az 6 karakter olmalı'),
+});
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

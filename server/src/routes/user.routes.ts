@@ -2,7 +2,7 @@ import { Router, RequestHandler } from 'express';
 import * as userController from '../controllers/user.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
-import { preferencesSchema } from '../validators/user.validator.js';
+import { preferencesSchema, updateProfileSchema, changePasswordSchema } from '../validators/user.validator.js';
 
 const router = Router();
 
@@ -22,5 +22,23 @@ router.post(
   userController.upload.single('photo') as unknown as RequestHandler,
   userController.uploadProfilePhoto as unknown as RequestHandler
 );
+
+router.put(
+  '/profile',
+  validateBody(updateProfileSchema),
+  userController.updateProfile as unknown as RequestHandler
+);
+router.put(
+  '/password',
+  validateBody(changePasswordSchema),
+  userController.changePassword as unknown as RequestHandler
+);
+router.delete('/account', userController.deleteAccount as unknown as RequestHandler);
+router.post(
+  '/profile-photo',
+  userController.upload.single('photo') as unknown as RequestHandler,
+  userController.uploadProfilePhoto as unknown as RequestHandler
+);
+
 
 export default router;
