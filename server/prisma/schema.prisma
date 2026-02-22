@@ -66,6 +66,7 @@ model User {
   email             String            @unique
   passwordHash      String
   city              String?
+  profilePhoto      String?
   preferences       Json?
   isPremium         Boolean           @default(false)
   dailyRefreshCount    Int               @default(0)

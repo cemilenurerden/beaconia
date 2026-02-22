@@ -250,3 +250,10 @@ export async function updatePreferences(
 
   return user.preferences as unknown as UserPreferences;
 }
+
+export async function updateProfilePhoto(userId: string, photoUrl: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { profilePhoto: photoUrl },
+  });
+}

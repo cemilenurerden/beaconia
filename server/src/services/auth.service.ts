@@ -13,6 +13,7 @@ export interface AuthResult {
     name: string;
     email: string;
     city: string | null;
+    profilePhoto: string | null;
     createdAt: Date;
   };
 }
@@ -50,6 +51,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
       name: user.name,
       email: user.email,
       city: user.city,
+      profilePhoto: user.profilePhoto ?? null,
       createdAt: user.createdAt,
     },
   };
@@ -82,6 +84,7 @@ export async function login(input: LoginInput): Promise<AuthResult> {
       name: user.name,
       email: user.email,
       city: user.city,
+      profilePhoto: user.profilePhoto ?? null,
       createdAt: user.createdAt,
     },
   };

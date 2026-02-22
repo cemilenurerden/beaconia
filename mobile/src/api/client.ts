@@ -30,13 +30,18 @@ class ApiClient {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
+    const headers = this.getHeaders();
+    if (options.body instanceof FormData) {
+      delete headers['Content-Type']; // fetch otomatik multipart boundary koyar
+    }
+
     let response: Response;
     try {
       response = await fetch(url, {
         ...options,
         signal: controller.signal,
         headers: {
-          ...this.getHeaders(),
+          ...headers,
           ...options.headers,
         },
       });
@@ -89,6 +94,17 @@ class ApiClient {
 
   delete<T>(endpoint: string) {
     return this.request<T>(endpoint, { method: 'DELETE' });
+  }
+
+  async uploadPhoto<T>(endpoint: string, uri: string, fieldName = 'photo'): Promise<T> {
+    const filename = uri.split('/').pop() ?? 'photo.jpg';
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+    const formData = new FormData();
+    formData.append(fieldName, { uri, name: filename, type } as any);
+
+    return this.request<T>(endpoint, { method: 'POST', body: formData as any });
   }
 }
 
