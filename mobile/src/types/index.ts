@@ -124,6 +124,16 @@ export interface ApiErrorResponse {
   };
 }
 
+// ---- Self Analysis ----
+export interface Insight {
+  id: string;
+  emoji: string;
+  title: string;
+  subtitle: string;
+  detail: string;
+  accentColor: string;
+}
+
 // ---- Pagination ----
 export interface Pagination {
   page: number;

@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { UserStats, UserPreferences, ProfileAnalysis, User } from '../types';
+import type { UserStats, UserPreferences, ProfileAnalysis, User, Insight } from '../types';
 
 export function getStats() {
   return api.get<UserStats>('/user/stats');
@@ -27,4 +27,8 @@ export function changePassword(data: { currentPassword: string; newPassword: str
 
 export function deleteAccount() {
   return api.delete<{ message: string }>('/user/account');
+}
+
+export function getSelfAnalysis() {
+  return api.get<Insight[]>('/user/self-analysis');
 }

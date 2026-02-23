@@ -105,6 +105,20 @@ export async function deleteAccount(
   }
 }
 
+export async function getSelfAnalysis(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const insights = await userService.getSelfAnalysis(userId);
+    sendSuccess(res, insights);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function uploadProfilePhoto(
   req: AuthRequest,
   res: Response,

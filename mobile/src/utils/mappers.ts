@@ -41,6 +41,10 @@ const goal = biMap([
   ['Üretken Olmak', 'productive'],
 ]);
 
+export function moodToEmoji(apiMood: string): string {
+  return mood.toForm[apiMood] ?? '😊';
+}
+
 export interface FormValues {
   duration: number;
   energy: string;
