@@ -3,9 +3,11 @@ import { View, Text, TextInput, Pressable, Alert, ActivityIndicator } from 'reac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSettingsStore } from '../../src/store/settings';
 import { changePassword } from '../../src/api/user';
 
 export default function ChangePasswordScreen() {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -46,51 +48,51 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-slate-900">
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
         <Pressable onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+          <Ionicons name="arrow-back" size={24} color={isDark ? '#F8FAFC' : '#111827'} />
         </Pressable>
-        <Text className="text-lg font-bold text-gray-900">Şifre Değiştir</Text>
+        <Text className="text-lg font-bold text-gray-900 dark:text-white">Şifre Değiştir</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <View className="mx-4 mt-6 gap-4">
         <View>
-          <Text className="text-sm font-medium text-gray-600 mb-2">Mevcut Şifre</Text>
+          <Text className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">Mevcut Şifre</Text>
           <TextInput
             value={currentPassword}
             onChangeText={setCurrentPassword}
             placeholder="Mevcut şifrenizi girin"
             placeholderTextColor="#9CA3AF"
             secureTextEntry
-            className="bg-white rounded-xl px-4 py-4 text-sm text-gray-900"
+            className="bg-white dark:bg-slate-800 rounded-xl px-4 py-4 text-sm text-gray-900 dark:text-white"
             style={inputStyle}
           />
         </View>
 
         <View>
-          <Text className="text-sm font-medium text-gray-600 mb-2">Yeni Şifre</Text>
+          <Text className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">Yeni Şifre</Text>
           <TextInput
             value={newPassword}
             onChangeText={setNewPassword}
             placeholder="En az 6 karakter"
             placeholderTextColor="#9CA3AF"
             secureTextEntry
-            className="bg-white rounded-xl px-4 py-4 text-sm text-gray-900"
+            className="bg-white dark:bg-slate-800 rounded-xl px-4 py-4 text-sm text-gray-900 dark:text-white"
             style={inputStyle}
           />
         </View>
 
         <View>
-          <Text className="text-sm font-medium text-gray-600 mb-2">Yeni Şifre Tekrar</Text>
+          <Text className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">Yeni Şifre Tekrar</Text>
           <TextInput
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Yeni şifrenizi tekrar girin"
             placeholderTextColor="#9CA3AF"
             secureTextEntry
-            className="bg-white rounded-xl px-4 py-4 text-sm text-gray-900"
+            className="bg-white dark:bg-slate-800 rounded-xl px-4 py-4 text-sm text-gray-900 dark:text-white"
             style={inputStyle}
           />
         </View>

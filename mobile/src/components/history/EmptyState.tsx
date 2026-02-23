@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from 'nativewind';
 import type { ComponentProps } from 'react';
 
 interface EmptyStateProps {
@@ -9,18 +10,21 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
       <View style={{
         width: 64, height: 64, borderRadius: 32,
-        backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+        backgroundColor: isDark ? '#334155' : '#F3F4F6', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
       }}>
-        <Ionicons name={icon} size={32} color="#9CA3AF" />
+        <Ionicons name={icon} size={32} color={isDark ? '#64748B' : '#9CA3AF'} />
       </View>
-      <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827', marginBottom: 4 }}>
+      <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#F8FAFC' : '#111827', marginBottom: 4 }}>
         {title}
       </Text>
-      <Text style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center' }}>
+      <Text style={{ fontSize: 14, color: isDark ? '#64748B' : '#9CA3AF', textAlign: 'center' }}>
         {subtitle}
       </Text>
     </View>

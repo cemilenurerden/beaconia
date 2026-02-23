@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from 'nativewind';
 import { AuthHeader } from './AuthHeader';
 
 interface AuthScreenProps {
@@ -15,20 +16,21 @@ interface AuthScreenProps {
 }
 
 export function AuthScreen({ navTitle, headerTitle, headerSubtitle, error, children, footer }: AuthScreenProps) {
+  useColorScheme();
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
       {/* Sol ve sağ mavi border efekti */}
-      <View className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-200" />
-      <View className="absolute right-0 top-0 bottom-0 w-1 bg-indigo-200" />
+      <View className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-200 dark:bg-indigo-800" />
+      <View className="absolute right-0 top-0 bottom-0 w-1 bg-indigo-200 dark:bg-indigo-800" />
 
       {/* Header */}
       <View className="flex-row items-center px-5 py-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="chevron-back" size={24} color="#111827" />
         </Pressable>
-        <Text className="flex-1 text-center text-base font-semibold text-gray-900 mr-6">
+        <Text className="flex-1 text-center text-base font-semibold text-gray-900 dark:text-white mr-6">
           {navTitle}
         </Text>
       </View>

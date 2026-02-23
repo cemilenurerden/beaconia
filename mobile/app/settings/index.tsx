@@ -8,8 +8,9 @@ import { useAuthStore } from '../../src/store/auth';
 import { deleteAccount } from '../../src/api/user';
 
 function SectionHeader({ title }: { title: string }) {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   return (
-    <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2 mt-2">
+    <Text className={`text-xs font-semibold ${isDark ? 'text-slate-500' : 'text-gray-400'} uppercase tracking-wider px-4 mb-2 mt-2`}>
       {title}
     </Text>
   );
@@ -28,12 +29,13 @@ function SettingsRow({
   danger?: boolean;
   rightElement?: React.ReactNode;
 }) {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   return (
     <Pressable
       onPress={onPress}
       android_ripple={{ color: '#f3f4f6' }}
       style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-      className="flex-row items-center px-4 py-3.5 border-b border-gray-50"
+      className={`flex-row items-center px-4 py-3.5 border-b ${isDark ? 'border-slate-700' : 'border-gray-50'}`}
     >
       <Ionicons
         name={icon as any}
@@ -42,7 +44,7 @@ function SettingsRow({
         style={{ marginRight: 12 }}
       />
       <Text
-        className={`flex-1 text-sm font-medium ${danger ? 'text-red-500' : 'text-gray-800'}`}
+        className={`flex-1 text-sm font-medium ${danger ? 'text-red-500' : isDark ? 'text-slate-200' : 'text-gray-800'}`}
       >
         {label}
       </Text>
@@ -57,6 +59,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const darkModeEnabled = useSettingsStore((s) => s.darkModeEnabled);
   const toggleDarkMode = useSettingsStore((s) => s.toggleDarkMode);
+  const isDark = darkModeEnabled;
 
   const logout = useAuthStore((s) => s.logout);
 
@@ -89,13 +92,13 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-slate-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
         <Pressable onPress={() => router.push('/(tabs)/profile')}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+          <Ionicons name="arrow-back" size={24} color={isDark ? '#F8FAFC' : '#111827'} />
         </Pressable>
-        <Text className="text-2xl font-bold text-gray-900">Ayarlar</Text>
+        <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Ayarlar</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -103,7 +106,7 @@ export default function SettingsScreen() {
         {/* Premium */}
         <SectionHeader title="Üyelik" />
         <View
-          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl overflow-hidden`}
           style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
         >
           <SettingsRow
@@ -116,7 +119,7 @@ export default function SettingsScreen() {
         {/* Profil Ayarları */}
         <SectionHeader title="Profil Ayarları" />
         <View
-          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl overflow-hidden`}
           style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
         >
           <SettingsRow
@@ -145,7 +148,7 @@ export default function SettingsScreen() {
         {/* Uygulama Ayarları */}
         <SectionHeader title="Uygulama Ayarları" />
         <View
-          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl overflow-hidden`}
           style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
         >
           <SettingsRow

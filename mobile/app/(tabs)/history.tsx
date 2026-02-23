@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, SectionList, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useColorScheme } from 'nativewind';
 import { Ionicons } from '@expo/vector-icons';
 import { useHistory } from '../../src/hooks/useHistory';
 import TabSwitcher from '../../src/components/history/TabSwitcher';
@@ -17,13 +18,15 @@ const TABS = [
 export default function HistoryScreen() {
   const [activeTab, setActiveTab] = useState('history');
   const { decisions, favorites, loading, sections, handleRemoveFavorite } = useHistory();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-slate-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
         <View style={{ width: 22 }} />
-        <Text className="text-2xl font-bold text-gray-900">Etkinliklerim</Text>
+        <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Etkinliklerim</Text>
         <Ionicons name="calendar-outline" size={22} color="#9CA3AF" />
       </View>
 
@@ -48,7 +51,8 @@ export default function HistoryScreen() {
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <Text style={{
-                fontSize: 12, fontWeight: '700', color: '#9CA3AF',
+                fontSize: 12, fontWeight: '700',
+                color: colorScheme === 'dark' ? '#64748B' : '#9CA3AF',
                 letterSpacing: 1, marginBottom: 10, marginTop: 8,
               }}>
                 {section.title}

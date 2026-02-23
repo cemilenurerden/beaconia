@@ -5,8 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSettingsStore } from '../../src/store/settings';
 
 function SectionHeader({ title }: { title: string }) {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   return (
-    <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2 mt-2">
+    <Text className={`text-xs font-semibold ${isDark ? 'text-slate-500' : 'text-gray-400'} uppercase tracking-wider px-4 mb-2 mt-2`}>
       {title}
     </Text>
   );
@@ -25,13 +26,14 @@ function NotificationRow({
   onToggle: () => void;
   disabled?: boolean;
 }) {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   return (
     <View
-      className="flex-row items-center px-4 py-3.5 border-b border-gray-50"
+      className={`flex-row items-center px-4 py-3.5 border-b ${isDark ? 'border-slate-700' : 'border-gray-50'}`}
       style={{ opacity: disabled ? 0.4 : 1 }}
     >
       <Ionicons name={icon as any} size={20} color="#4F46E5" style={{ marginRight: 12 }} />
-      <Text className="flex-1 text-sm font-medium text-gray-800">{label}</Text>
+      <Text className={`flex-1 text-sm font-medium ${isDark ? 'text-slate-200' : 'text-gray-800'}`}>{label}</Text>
       <Switch
         value={value}
         onValueChange={onToggle}
@@ -45,6 +47,7 @@ function NotificationRow({
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
 
   const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
   const notifyActivitySuggestions = useSettingsStore((s) => s.notifyActivitySuggestions);
@@ -59,13 +62,13 @@ export default function NotificationsScreen() {
   const categoriesDisabled = !notificationsEnabled;
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-slate-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
         <Pressable onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+          <Ionicons name="arrow-back" size={24} color={isDark ? '#F8FAFC' : '#111827'} />
         </Pressable>
-        <Text className="text-lg font-bold text-gray-900">Bildirimler</Text>
+        <Text className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Bildirimler</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -73,7 +76,7 @@ export default function NotificationsScreen() {
         {/* Genel */}
         <SectionHeader title="Genel" />
         <View
-          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl overflow-hidden`}
           style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
         >
           <NotificationRow
@@ -87,7 +90,7 @@ export default function NotificationsScreen() {
         {/* Kategoriler */}
         <SectionHeader title="Kategoriler" />
         <View
-          className="mx-4 mb-4 bg-white rounded-2xl overflow-hidden"
+          className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl overflow-hidden`}
           style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
         >
           <NotificationRow

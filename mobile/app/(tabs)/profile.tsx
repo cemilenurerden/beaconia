@@ -28,6 +28,7 @@ export default function ProfileScreen() {
   const profilePhoto = useSettingsStore((s) => s.profilePhoto);
   const setProfilePhoto = useSettingsStore((s) => s.setProfilePhoto);
   const setUserProfilePhoto = useAuthStore((s) => s.setUserProfilePhoto);
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
 
   const handleLogout = () => {
     logout();
@@ -61,12 +62,12 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-slate-900' : 'bg-gray-50'}`}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
           <View style={{ width: 22 }} />
-          <Text className="text-2xl font-bold text-gray-900">Profil</Text>
+          <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Profil</Text>
           <Pressable onPress={() => router.push('/settings')}>
             <Ionicons name="settings-outline" size={22} color="#9CA3AF" />
           </Pressable>
@@ -118,7 +119,7 @@ export default function ProfileScreen() {
               <Ionicons name="camera" size={13} color="#fff" />
             </View>
           </Pressable>
-          <Text className="text-lg font-bold text-gray-900 mt-3">
+          <Text className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'} mt-3`}>
             {user?.name ?? 'Kullanici'}
           </Text>
           {user?.isPremium ? (
@@ -127,8 +128,8 @@ export default function ProfileScreen() {
               <Text className="ml-1">&#10024;</Text>
             </View>
           ) : (
-            <View className="flex-row items-center bg-gray-100 px-3 py-1 rounded-full mt-1">
-              <Text className="text-gray-500 font-semibold text-xs">Ucretsiz</Text>
+            <View className={`flex-row items-center ${isDark ? 'bg-slate-700' : 'bg-gray-100'} px-3 py-1 rounded-full mt-1`}>
+              <Text className={`${isDark ? 'text-slate-400' : 'text-gray-500'} font-semibold text-xs`}>Ucretsiz</Text>
             </View>
           )}
         </View>
@@ -138,20 +139,20 @@ export default function ProfileScreen() {
         ) : (
           <>
             {/* Aktivite DNA Karti */}
-            <View className="mx-4 mb-4 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+            <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
               <View className="flex-row items-center mb-4">
                 <Ionicons name="analytics-outline" size={20} color="#4F46E5" />
-                <Text className="text-base font-bold text-gray-900 ml-2">Senin Aktivite DNA'n</Text>
+                <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} ml-2`}>Senin Aktivite DNA'n</Text>
               </View>
 
               {analysis.categoryDistribution.length > 0 ? (
                 analysis.categoryDistribution.slice(0, 5).map((cat) => (
                   <View key={cat.category} className="mb-3">
                     <View className="flex-row justify-between mb-1">
-                      <Text className="text-sm text-gray-700">{cat.category}</Text>
-                      <Text className="text-sm font-semibold text-gray-900">%{cat.percentage}</Text>
+                      <Text className={`text-sm ${isDark ? 'text-slate-300' : 'text-gray-700'}`}>{cat.category}</Text>
+                      <Text className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>%{cat.percentage}</Text>
                     </View>
-                    <View className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <View className={`h-2 ${isDark ? 'bg-slate-700' : 'bg-gray-100'} rounded-full overflow-hidden`}>
                       <View
                         className="h-2 rounded-full"
                         style={{
@@ -163,29 +164,29 @@ export default function ProfileScreen() {
                   </View>
                 ))
               ) : (
-                <Text className="text-sm text-gray-400 text-center py-2">Henuz aktivite verisi yok</Text>
+                <Text className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-400'} text-center py-2`}>Henuz aktivite verisi yok</Text>
               )}
 
               {/* Tercih Bilgileri */}
-              <View className="flex-row justify-between mt-4 pt-4 border-t border-gray-100">
+              <View className={`flex-row justify-between mt-4 pt-4 border-t ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
                 <View className="items-center flex-1">
-                  <Text className="text-xs text-gray-400 mb-1">ENERJI</Text>
-                  <Text className="text-sm font-semibold text-gray-900">{analysis.topEnergy}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mb-1`}>ENERJI</Text>
+                  <Text className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analysis.topEnergy}</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-xs text-gray-400 mb-1">MEKAN</Text>
-                  <Text className="text-sm font-semibold text-gray-900">{analysis.topLocation}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mb-1`}>MEKAN</Text>
+                  <Text className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analysis.topLocation}</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-xs text-gray-400 mb-1">SOSYAL</Text>
-                  <Text className="text-sm font-semibold text-gray-900">{analysis.topSocial}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mb-1`}>SOSYAL</Text>
+                  <Text className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analysis.topSocial}</Text>
                 </View>
               </View>
             </View>
 
             {/* Mod Gecmisi */}
-            <View className="mx-4 mb-4 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
-              <Text className="text-base font-bold text-gray-900 mb-3">Mod Gecmisi</Text>
+            <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>Mod Gecmisi</Text>
               {analysis.topMoods.length > 0 ? (
                 <View className="flex-row justify-center gap-3">
                   {analysis.topMoods.map((mood, i) => (
@@ -198,36 +199,36 @@ export default function ProfileScreen() {
                   ))}
                 </View>
               ) : (
-                <Text className="text-sm text-gray-400 text-center py-2">Henuz mod verisi yok</Text>
+                <Text className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-400'} text-center py-2`}>Henuz mod verisi yok</Text>
               )}
             </View>
 
             {/* Istatistik Kartlari - 2x2 Grid */}
             <View className="mx-4 mb-4">
               <View className="flex-row gap-3 mb-3">
-                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                <View className={`flex-1 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
                   <Ionicons name="checkmark-circle-outline" size={22} color="#4F46E5" />
-                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.totalActivities}</Text>
-                  <Text className="text-xs text-gray-400 mt-1">Toplam Aktivite</Text>
+                  <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mt-2`}>{analysis.totalActivities}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mt-1`}>Toplam Aktivite</Text>
                 </View>
-                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                <View className={`flex-1 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
                   <Ionicons name="flame-outline" size={22} color="#F97316" />
-                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.longestStreak}</Text>
-                  <Text className="text-xs text-gray-400 mt-1">En Uzun Seri (Gun)</Text>
+                  <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mt-2`}>{analysis.longestStreak}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mt-1`}>En Uzun Seri (Gun)</Text>
                 </View>
               </View>
               <View className="flex-row gap-3">
-                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                <View className={`flex-1 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
                   <Ionicons name="heart-outline" size={22} color="#EF4444" />
-                  <Text className="text-2xl font-bold text-gray-900 mt-2">
+                  <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mt-2`}>
                     {analysis.favoriteActivity || '-'}
                   </Text>
-                  <Text className="text-xs text-gray-400 mt-1">Favori</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mt-1`}>Favori</Text>
                 </View>
-                <View className="flex-1 bg-white rounded-2xl p-4" style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+                <View className={`flex-1 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
                   <Ionicons name="time-outline" size={22} color="#4F46E5" />
-                  <Text className="text-2xl font-bold text-gray-900 mt-2">{analysis.weeklyHours}</Text>
-                  <Text className="text-xs text-gray-400 mt-1">Bu Hafta (Saat)</Text>
+                  <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mt-2`}>{analysis.weeklyHours}</Text>
+                  <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mt-1`}>Bu Hafta (Saat)</Text>
                 </View>
               </View>
             </View>
