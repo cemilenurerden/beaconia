@@ -5,8 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '../../src/store/auth';
 import { useProfile } from '../../src/hooks/useProfile';
+import { useKendiniTani } from '../../src/hooks/useKendiniTani';
 import { useSettingsStore } from '../../src/store/settings';
 import { api } from '../../src/api/client';
+import { KendiniTaniSection } from '../../src/components/profile/KendiniTaniSection';
+import { moodToEmoji } from '../../src/utils/mappers';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Fitness: '#4F46E5',
@@ -25,6 +28,7 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const { analysis, loading } = useProfile();
+  const { insights } = useKendiniTani();
   const profilePhoto = useSettingsStore((s) => s.profilePhoto);
   const setProfilePhoto = useSettingsStore((s) => s.setProfilePhoto);
   const setUserProfilePhoto = useAuthStore((s) => s.setUserProfilePhoto);
@@ -184,6 +188,9 @@ export default function ProfileScreen() {
               </View>
             </View>
 
+            {/* Kendini Tani */}
+            <KendiniTaniSection insights={insights} isDark={isDark} />
+
             {/* Mod Gecmisi */}
             <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
               <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>Mod Gecmisi</Text>
@@ -194,7 +201,7 @@ export default function ProfileScreen() {
                       key={i}
                       className="w-12 h-12 rounded-full bg-indigo-50 items-center justify-center"
                     >
-                      <Text className="text-xl">{mood}</Text>
+                      <Text className="text-xl">{moodToEmoji(mood)}</Text>
                     </View>
                   ))}
                 </View>

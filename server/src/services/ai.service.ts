@@ -75,6 +75,81 @@ ZORUNLU: Sadece aşağıdaki JSON formatında yanıt ver, başka hiçbir şey ya
 {"selectedId": "...", "planBId": "..." veya null, "reason": "...", "firstStep": "..."}`;
 }
 
+export interface SelfAnalysisInsight {
+  emoji: string;
+  title: string;
+  subtitle: string;
+  detail: string;
+}
+
+interface SelfAnalysisData {
+  totalDecisions: number;
+  retryRatio: number;
+  topSlot: string;
+  topDecisionCategories: { category: string; pct: number }[];
+  topFavoriteCategories: { category: string; count: number }[];
+  topEnergy: string;
+  topLocation: string;
+  topSocial: string;
+}
+
+function buildSelfAnalysisPrompt(data: SelfAnalysisData): string {
+  const favText = data.topFavoriteCategories.length > 0
+    ? data.topFavoriteCategories.map((c) => `${c.category} (${c.count} favori)`).join(', ')
+    : 'veri yok';
+
+  return `Sen Beaconia uygulamasının kişisel analiz asistanısın. Kullanıcının aktivite verilerini inceleyerek 3-5 adet kişiselleştirilmiş içgörü üret.
+
+KULLANICI VERİLERİ:
+- Toplam aktivite: ${data.totalDecisions}
+- En aktif zaman dilimi: ${data.topSlot}
+- Yenileme oranı: %${Math.round(data.retryRatio * 100)} (aktiviteleri yenileme eğilimi)
+- En çok yaptığı kategoriler: ${data.topDecisionCategories.map((c) => `${c.category} (%${c.pct})`).join(', ')}
+- Favori kategoriler: ${favText}
+- Enerji tercihi: ${data.topEnergy}
+- Konum tercihi: ${data.topLocation}
+- Sosyal tercih: ${data.topSocial}
+
+İÇGÖRÜ KURALLARI:
+- Her içgörü farklı bir davranış örüntüsünü yansıtsın
+- Emoji: ilgili ve açıklayıcı tek bir emoji
+- Başlık: 2-3 kelime, kişilik ifade eden bir etiket (örn: "Sabah İnsanı", "Seçici Ruh")
+- Alt başlık (subtitle): 1 kısa cümle, kart üzerinde görünecek özet
+- Detay (detail): 3-4 cümle, kart tıklandığında açılacak derin analiz. Veriye dayalı, kişisel ve motive edici. Sen-dili kullan. Kullanıcının örüntüsünü somut sayılarla destekle ve bu alışkanlığın ne anlama geldiğini açıkla.
+- Yeterli veri yoksa o içgörüyü atlayabilirsin, en az 1 en fazla 5 içgörü üret
+
+ZORUNLU: Sadece aşağıdaki JSON array formatında yanıt ver, başka hiçbir şey yazma:
+[{"emoji": "🌅", "title": "...", "subtitle": "...", "detail": "..."}, ...]`;
+}
+
+export async function getSelfAnalysisInsights(
+  data: SelfAnalysisData
+): Promise<SelfAnalysisInsight[] | null> {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const result = await Promise.race([
+      model.generateContent(buildSelfAnalysisPrompt(data)),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI timeout')), AI_TIMEOUT)
+      ),
+    ]);
+    const text = result.response.text().trim();
+
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      console.error('Self-analysis AI yanıtından JSON çıkarılamadı:', text);
+      return null;
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]) as SelfAnalysisInsight[];
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (error) {
+    console.error('Self-analysis AI servisi hatası:', error);
+    return null;
+  }
+}
+
 export async function getAiRecommendation(
   input: RecommendInput,
   candidates: Activity[]

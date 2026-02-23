@@ -15,24 +15,24 @@ export async function recommend(
 
     // Limit kontrolleri
     let refreshRemaining: number | undefined;
-    if (userId) {
-      if (input.isRetry) {
-        // Retry → günde 3 yenileme hakkı
-        const refreshCheck = await recommendService.checkAndIncrementRefresh(userId);
-        if (!refreshCheck.allowed) {
-          sendError(res, 'REFRESH_LIMIT', 'Günlük ücretsiz yenileme hakkın doldu. Premium\'a geç!', 403);
-          return;
-        }
-        refreshRemaining = refreshCheck.remaining;
-      } else {
-        // İlk öneri → günde 1 öneri hakkı
-        const recommendCheck = await recommendService.checkAndIncrementRecommend(userId);
-        if (!recommendCheck.allowed) {
-          sendError(res, 'RECOMMEND_LIMIT', 'Günlük ücretsiz öneri hakkın doldu. Premium\'a geç!', 403);
-          return;
-        }
-      }
-    }
+    // if (userId) {
+    //   if (input.isRetry) {
+    //     // Retry → günde 3 yenileme hakkı
+    //     const refreshCheck = await recommendService.checkAndIncrementRefresh(userId);
+    //     if (!refreshCheck.allowed) {
+    //       sendError(res, 'REFRESH_LIMIT', 'Günlük ücretsiz yenileme hakkın doldu. Premium\'a geç!', 403);
+    //       return;
+    //     }
+    //     refreshRemaining = refreshCheck.remaining;
+    //   } else {
+    //     // İlk öneri → günde 1 öneri hakkı
+    //     const recommendCheck = await recommendService.checkAndIncrementRecommend(userId);
+    //     if (!recommendCheck.allowed) {
+    //       sendError(res, 'RECOMMEND_LIMIT', 'Günlük ücretsiz öneri hakkın doldu. Premium\'a geç!', 403);
+    //       return;
+    //     }
+    //   }
+    // }
 
     const result = await recommendService.recommend(input, userId);
 

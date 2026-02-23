@@ -17,6 +17,7 @@ router.put(
   userController.updatePreferences as unknown as RequestHandler
 );
 router.get('/profile-analysis', userController.getProfileAnalysis as unknown as RequestHandler);
+router.get('/self-analysis', userController.getSelfAnalysis as unknown as RequestHandler);
 router.post(
   '/profile-photo',
   userController.upload.single('photo') as unknown as RequestHandler,
