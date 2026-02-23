@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, type TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from 'nativewind';
 
 interface AuthInputProps extends TextInputProps {
   label: string;
@@ -9,18 +10,19 @@ interface AuthInputProps extends TextInputProps {
 }
 
 export function AuthInput({ label, isPassword, error, ...rest }: AuthInputProps) {
+  useColorScheme();
   const [secure, setSecure] = useState(isPassword);
 
   return (
     <View className="mb-4">
-      <Text className="text-sm font-medium text-gray-700 mb-2">{label}</Text>
+      <Text className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{label}</Text>
       <View
-        className={`flex-row items-center rounded-xl border bg-white px-4 py-3.5 ${
-          error ? 'border-red-400' : 'border-gray-200'
+        className={`flex-row items-center rounded-xl border bg-white dark:bg-slate-800 px-4 py-3.5 ${
+          error ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'
         }`}
       >
         <TextInput
-          className="flex-1 text-base text-gray-900"
+          className="flex-1 text-base text-gray-900 dark:text-white"
           placeholderTextColor="#9CA3AF"
           secureTextEntry={secure}
           autoCapitalize="none"

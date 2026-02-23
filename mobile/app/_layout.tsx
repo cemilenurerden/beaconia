@@ -3,18 +3,25 @@ import { useEffect } from 'react';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useColorScheme } from 'nativewind';
 import { useSettingsStore } from '../src/store/settings';
 import { requestPermissions, syncNotifications } from '../src/notifications';
 
 export default function RootLayout() {
+  const darkModeEnabled = useSettingsStore((s) => s.darkModeEnabled);
+  const { setColorScheme } = useColorScheme();
+
+  // darkModeEnabled değiştiğinde NativeWind'e bildir → dark: sınıfları aktive olur
   useEffect(() => {
-    // İzin iste, sonra mevcut ayarlara göre bildirimleri ayarla
+    setColorScheme(darkModeEnabled ? 'dark' : 'light');
+  }, [darkModeEnabled]);
+
+  useEffect(() => {
     requestPermissions().then((granted) => {
       if (!granted) return;
       syncNotifications(useSettingsStore.getState());
     });
 
-    // Ayarlar değiştiğinde bildirimleri güncelle
     const unsubscribe = useSettingsStore.subscribe((state) => {
       syncNotifications(state);
     });
@@ -25,7 +32,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <Slot />
-      <StatusBar style="auto" />
+      <StatusBar style={darkModeEnabled ? 'light' : 'dark'} />
     </SafeAreaProvider>
   );
 }

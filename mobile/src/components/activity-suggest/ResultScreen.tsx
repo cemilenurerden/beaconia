@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CATEGORY_ICONS, PLAN_B_REASONS } from '../../constants/activity-suggest';
+import { useSettingsStore } from '../../store/settings';
 import type { RecommendResult } from '../../types';
 
 const MAX_FREE_REFRESHES = 3;
@@ -17,6 +18,7 @@ interface ResultScreenProps {
 }
 
 export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSelectPlanB, refreshCount }: ResultScreenProps) {
+  const isDark = useSettingsStore((s) => s.darkModeEnabled);
   const [showPlanB, setShowPlanB] = useState(false);
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -43,15 +45,15 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F0F4FF' }}>
+    <View style={{ flex: 1 }}>
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
         <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={24} color="#111827" />
+          <Ionicons name="chevron-back" size={24} color={isDark ? '#F8FAFC' : '#111827'} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: '#111827' }}>Senin İçin Seçtik</Text>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: isDark ? '#F8FAFC' : '#111827' }}>Senin İçin Seçtik</Text>
         <TouchableOpacity activeOpacity={0.7}>
-          <Ionicons name="share-outline" size={22} color="#111827" />
+          <Ionicons name="share-outline" size={22} color={isDark ? '#F8FAFC' : '#111827'} />
         </TouchableOpacity>
       </View>
 
@@ -59,7 +61,7 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
         {/* Activity Card */}
         <View style={{ alignItems: 'center', marginTop: 28, marginBottom: 28 }}>
           <Text style={{ fontSize: 64 }}>{icon}</Text>
-          <Text style={{ fontSize: 26, fontWeight: '700', color: '#111827', marginTop: 16, textAlign: 'center' }}>
+          <Text style={{ fontSize: 26, fontWeight: '700', color: isDark ? '#F8FAFC' : '#111827', marginTop: 16, textAlign: 'center' }}>
             {selected.title}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#D1FAE5', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, marginTop: 14 }}>
@@ -74,10 +76,14 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
         <View style={{ marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
             <Ionicons name="sparkles" size={20} color="#4F46E5" />
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#111827', marginLeft: 8 }}>Neden bu?</Text>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: isDark ? '#F8FAFC' : '#111827', marginLeft: 8 }}>Neden bu?</Text>
           </View>
-          <View style={{ backgroundColor: '#FFFFFF', borderRadius: 18, padding: 22, minHeight: 100, borderWidth: 1, borderColor: '#E5E7EB' }}>
-            <Text style={{ fontSize: 16, color: '#374151', lineHeight: 26 }}>{reason}</Text>
+          <View style={{
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+            borderRadius: 18, padding: 22, minHeight: 100,
+            borderWidth: 1, borderColor: isDark ? '#334155' : '#E5E7EB',
+          }}>
+            <Text style={{ fontSize: 16, color: isDark ? '#CBD5E1' : '#374151', lineHeight: 26 }}>{reason}</Text>
           </View>
         </View>
 
@@ -93,44 +99,53 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
 
         {/* Plan B */}
         {planB && (
-          <View style={{ backgroundColor: '#FFFFFF', borderRadius: 20, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#E5E7EB' }}>
-            {/* Plan B Header */}
+          <View style={{
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+            borderRadius: 20, padding: 20, marginBottom: 20,
+            borderWidth: 1, borderColor: isDark ? '#334155' : '#E5E7EB',
+          }}>
             <TouchableOpacity
               onPress={() => setShowPlanB(!showPlanB)}
               activeOpacity={0.7}
               style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: isDark ? '#312E81' : '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons name="swap-horizontal" size={20} color="#4F46E5" />
                 </View>
                 <View style={{ marginLeft: 12 }}>
-                  <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827' }}>Plan B</Text>
+                  <Text style={{ fontSize: 17, fontWeight: '700', color: isDark ? '#F8FAFC' : '#111827' }}>Plan B</Text>
                   <Text style={{ fontSize: 12, fontWeight: '600', color: '#4F46E5', letterSpacing: 0.5 }}>ALTERNATİF SEÇENEK</Text>
                 </View>
               </View>
-              <Ionicons name={showPlanB ? 'chevron-up' : 'chevron-down'} size={22} color="#6B7280" />
+              <Ionicons name={showPlanB ? 'chevron-up' : 'chevron-down'} size={22} color={isDark ? '#94A3B8' : '#6B7280'} />
             </TouchableOpacity>
 
-            {/* Plan B Content */}
             {showPlanB && (
               <View style={{ marginTop: 16 }}>
-                <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 18, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                <View style={{
+                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                  borderRadius: 14, padding: 18,
+                  borderWidth: 1, borderColor: isDark ? '#334155' : '#E2E8F0',
+                }}>
                   <Text style={{ fontSize: 13, fontWeight: '600', color: '#4F46E5', marginBottom: 8 }}>
                     Enerjine daha uygun alternatif:
                   </Text>
-                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#111827', lineHeight: 26 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: isDark ? '#F8FAFC' : '#111827', lineHeight: 26 }}>
                     {planBDuration} dk {planB.title}
                   </Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12 }}>
-                    <Ionicons name="bulb-outline" size={16} color="#9CA3AF" />
-                    <Text style={{ fontSize: 13, color: '#6B7280', marginLeft: 6, flex: 1 }}>
-                      {planB.location === 'home' ? 'Evde rahatça yapabileceğin bir alternatif.' : planB.location === 'outdoor' ? 'Dışarıda yapabileceğin bir alternatif.' : 'İstediğin yerde yapabileceğin bir alternatif.'}
+                    <Ionicons name="bulb-outline" size={16} color={isDark ? '#64748B' : '#9CA3AF'} />
+                    <Text style={{ fontSize: 13, color: isDark ? '#94A3B8' : '#6B7280', marginLeft: 6, flex: 1 }}>
+                      {planB.location === 'home'
+                        ? 'Evde rahatça yapabileceğin bir alternatif.'
+                        : planB.location === 'outdoor'
+                          ? 'Dışarıda yapabileceğin bir alternatif.'
+                          : 'İstediğin yerde yapabileceğin bir alternatif.'}
                     </Text>
                   </View>
                 </View>
 
-                {/* Bunu Yapacağım Button */}
                 <TouchableOpacity
                   onPress={handleChoosePlanB}
                   activeOpacity={0.8}
@@ -152,9 +167,10 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
       {/* Bottom Action Bar */}
       <View style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
-        flexDirection: 'row', backgroundColor: '#FFFFFF',
+        flexDirection: 'row',
+        backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
         paddingVertical: 14, paddingHorizontal: 20,
-        borderTopWidth: 1, borderTopColor: '#F3F4F6',
+        borderTopWidth: 1, borderTopColor: isDark ? '#334155' : '#F3F4F6',
         justifyContent: 'space-around',
       }}>
         <TouchableOpacity onPress={onFavorite} activeOpacity={0.7} style={{ alignItems: 'center' }}>
@@ -165,7 +181,7 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
           <Ionicons name="refresh" size={24} color="#F59E0B" />
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
             <Text style={{ fontSize: 11, fontWeight: '600', color: '#F59E0B' }}>YENİLE</Text>
-            <Text style={{ fontSize: 10, fontWeight: '600', color: '#9CA3AF', marginLeft: 4 }}>
+            <Text style={{ fontSize: 10, fontWeight: '600', color: isDark ? '#64748B' : '#9CA3AF', marginLeft: 4 }}>
               {MAX_FREE_REFRESHES - refreshCount}/{MAX_FREE_REFRESHES}
             </Text>
           </View>
@@ -181,25 +197,25 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}>
           <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={handleSkipReason} />
           <View style={{
-            backgroundColor: '#FFFFFF', borderTopLeftRadius: 28, borderTopRightRadius: 28,
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+            borderTopLeftRadius: 28, borderTopRightRadius: 28,
             paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40,
             maxHeight: SCREEN_HEIGHT * 0.55,
           }}>
             {/* Handle */}
-            <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 20 }} />
+            <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#334155' : '#D1D5DB', marginBottom: 20 }} />
 
             {/* Icon */}
             <View style={{ alignItems: 'center', marginBottom: 16 }}>
-              <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: isDark ? '#312E81' : '#EDE9FE', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="bulb" size={24} color="#4F46E5" />
               </View>
             </View>
 
-            {/* Title */}
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#111827', textAlign: 'center', marginBottom: 8 }}>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: isDark ? '#F8FAFC' : '#111827', textAlign: 'center', marginBottom: 8 }}>
               Neden Plan A yerine bunu seçtin?
             </Text>
-            <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24, lineHeight: 20 }}>
+            <Text style={{ fontSize: 14, color: isDark ? '#94A3B8' : '#6B7280', textAlign: 'center', marginBottom: 24, lineHeight: 20 }}>
               Tercihlerini öğrenerek sana daha iyi öneriler sunabiliriz.
             </Text>
 
@@ -215,11 +231,11 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
                     style={{
                       paddingHorizontal: 18, paddingVertical: 12, borderRadius: 24,
                       borderWidth: 1.5,
-                      backgroundColor: isSelected ? '#EDE9FE' : '#FFFFFF',
-                      borderColor: isSelected ? '#4F46E5' : '#E5E7EB',
+                      backgroundColor: isSelected ? '#EDE9FE' : (isDark ? '#0F172A' : '#FFFFFF'),
+                      borderColor: isSelected ? '#4F46E5' : (isDark ? '#334155' : '#E5E7EB'),
                     }}
                   >
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: isSelected ? '#4F46E5' : '#374151' }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: isSelected ? '#4F46E5' : (isDark ? '#CBD5E1' : '#374151') }}>
                       {r} {isSelected ? '✕' : ''}
                     </Text>
                   </TouchableOpacity>
@@ -231,17 +247,14 @@ export default function ResultScreen({ result, onRetry, onBack, onFavorite, onSe
             <TouchableOpacity
               onPress={handleSaveReason}
               activeOpacity={0.8}
-              style={{
-                backgroundColor: '#4F46E5', borderRadius: 16, paddingVertical: 18,
-                alignItems: 'center', marginBottom: 12,
-              }}
+              style={{ backgroundColor: '#4F46E5', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginBottom: 12 }}
             >
               <Text style={{ fontSize: 17, fontWeight: '700', color: '#FFFFFF' }}>Kaydet</Text>
             </TouchableOpacity>
 
             {/* Skip */}
             <TouchableOpacity onPress={handleSkipReason} activeOpacity={0.7} style={{ alignItems: 'center', paddingVertical: 8 }}>
-              <Text style={{ fontSize: 15, color: '#9CA3AF', fontWeight: '600' }}>Atla</Text>
+              <Text style={{ fontSize: 15, color: isDark ? '#64748B' : '#9CA3AF', fontWeight: '600' }}>Atla</Text>
             </TouchableOpacity>
           </View>
         </View>

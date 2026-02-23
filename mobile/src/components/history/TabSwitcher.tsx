@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import { colors } from '../../constants/theme';
 
 interface Tab {
@@ -13,10 +14,13 @@ interface TabSwitcherProps {
 }
 
 export default function TabSwitcher({ tabs, activeTab, onTabChange }: TabSwitcherProps) {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
     <View style={{
       flexDirection: 'row',
-      backgroundColor: colors.gray100,
+      backgroundColor: isDark ? colors.slate700 : colors.gray100,
       borderRadius: 16,
       padding: 4,
     }}>
