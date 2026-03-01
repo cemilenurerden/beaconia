@@ -11,7 +11,7 @@ export function generateToken(userId: string): string {
   const token = jwt.sign(
     { sub: userId },
     config.jwtSecret,
-    { expiresIn: '7d' }
+    { expiresIn: config.jwtExpiresIn as jwt.SignOptions['expiresIn'] }
   );
   return token;
 }

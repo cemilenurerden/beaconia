@@ -21,8 +21,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       "expo-router",
       [
@@ -31,7 +30,8 @@
           "color": "#4F46E5",
           "defaultChannel": "default"
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }
