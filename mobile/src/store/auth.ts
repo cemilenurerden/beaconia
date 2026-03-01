@@ -25,7 +25,6 @@ interface AuthState {
   setTokens: (accessToken: string, refreshToken: string) => void;
   logout: () => Promise<void>;
   completeOnboarding: () => void;
-
   setUserProfilePhoto: (url: string) => void;
   updateUser: (fields: Partial<Pick<User, 'name' | 'city'>>) => void;
   hydrate: () => Promise<void>;
@@ -85,7 +84,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
 
   setUserProfilePhoto: (url) =>
-    set((state) => ({ user: state.user ? { ...state.user, profilePhoto: url } : null })),
+    set((state) => {
+      const updated = state.user ? { ...state.user, profilePhoto: url } : null;
+      if (updated) AsyncStorage.setItem(KEYS.USER, JSON.stringify(updated)).catch(() => {});
+      return { user: updated };
+    }),
+
   updateUser: (fields) =>
 
     set((state) => {

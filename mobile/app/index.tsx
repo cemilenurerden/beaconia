@@ -1,4 +1,5 @@
 import { Redirect } from 'expo-router';
+import { View, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '../src/store/auth';
 
 export default function Index() {
@@ -6,16 +7,15 @@ export default function Index() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const hasSeenOnboarding = useAuthStore((s) => s.hasSeenOnboarding);
 
-  // Store henüz SecureStore/AsyncStorage'dan okumadı, bekle
-  if (!isHydrated) return null;
-
-  if (!hasSeenOnboarding) {
-    return <Redirect href="/onboarding" />;
+  if (!isHydrated) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4F46E5" />
+      </View>
+    );
   }
 
-  if (isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
-  }
-
+  if (!hasSeenOnboarding) return <Redirect href="/onboarding" />;
+  if (isAuthenticated) return <Redirect href="/(tabs)" />;
   return <Redirect href="/(auth)/login" />;
 }
