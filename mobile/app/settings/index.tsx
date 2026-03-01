@@ -75,7 +75,7 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await deleteAccount();
-              logout();
+              await logout();
               router.replace('/(auth)/login');
             } catch (err: any) {
               Alert.alert('Hata', err?.message ?? 'Hesap silinemedi.');

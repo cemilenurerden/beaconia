@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service.js';
 import { sendSuccess } from '../utils/response.js';
-import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput } from '../validators/auth.validator.js';
+import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput, RefreshTokenInput } from '../validators/auth.validator.js';
 
 export async function register(
   req: Request,
@@ -68,6 +68,36 @@ export async function resetPassword(
     const input = req.body as ResetPasswordInput;
     const result = await authService.resetPassword(input);
     sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function refreshToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { refreshToken } = req.body as RefreshTokenInput;
+    const result = await authService.refresh(refreshToken);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function logout(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { refreshToken } = req.body as { refreshToken?: string };
+    if (refreshToken) {
+      await authService.logout(refreshToken);
+    }
+    sendSuccess(res, { message: 'Çıkış yapıldı' });
   } catch (error) {
     next(error);
   }

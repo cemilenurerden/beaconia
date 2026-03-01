@@ -12,6 +12,7 @@ export interface User {
 // ---- Auth ----
 export interface AuthResult {
   accessToken: string;
+  refreshToken: string;
   user: User;
 }
 

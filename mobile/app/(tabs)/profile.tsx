@@ -34,8 +34,8 @@ export default function ProfileScreen() {
   const setUserProfilePhoto = useAuthStore((s) => s.setUserProfilePhoto);
   const isDark = useSettingsStore((s) => s.darkModeEnabled);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace('/(auth)/login');
   };
 

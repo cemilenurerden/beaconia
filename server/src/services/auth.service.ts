@@ -1,13 +1,14 @@
 import * as argon2 from 'argon2';
 import crypto from 'crypto';
 import { prisma } from '../utils/prisma.js';
-import { generateToken } from '../utils/jwt.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { ApiError } from '../types/index.js';
 import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput } from '../validators/auth.validator.js';
 import { sendPasswordResetCode } from './email.service.js';
 
 export interface AuthResult {
   accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     name: string;
@@ -16,6 +17,10 @@ export interface AuthResult {
     profilePhoto: string | null;
     createdAt: Date;
   };
+}
+
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
 }
 
 export async function register(input: RegisterInput): Promise<AuthResult> {
@@ -41,11 +46,20 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
     },
   });
 
-  // Generate token
-  const accessToken = generateToken(user.id);
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  await prisma.refreshToken.create({
+    data: {
+      userId: user.id,
+      tokenHash: hashToken(refreshToken),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    },
+  });
 
   return {
     accessToken,
+    refreshToken,
     user: {
       id: user.id,
       name: user.name,
@@ -74,11 +88,26 @@ export async function login(input: LoginInput): Promise<AuthResult> {
     throw new ApiError(401, 'UNAUTHORIZED', 'Invalid credentials');
   }
 
-  // Generate token
-  const accessToken = generateToken(user.id);
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  // Süresi dolmuş token'ları temizle + yeni token ekle
+  await prisma.$transaction([
+    prisma.refreshToken.deleteMany({
+      where: { userId: user.id, expiresAt: { lt: new Date() } },
+    }),
+    prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(refreshToken),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
 
   return {
     accessToken,
+    refreshToken,
     user: {
       id: user.id,
       name: user.name,
@@ -88,6 +117,44 @@ export async function login(input: LoginInput): Promise<AuthResult> {
       createdAt: user.createdAt,
     },
   };
+}
+
+export async function refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+  const payload = verifyRefreshToken(refreshToken);
+  if (!payload) {
+    throw new ApiError(401, 'UNAUTHORIZED', 'Geçersiz refresh token');
+  }
+
+  const tokenHash = hashToken(refreshToken);
+  const newAccessToken = generateAccessToken(payload.sub);
+  const newRefreshToken = generateRefreshToken(payload.sub);
+  const newTokenHash = hashToken(newRefreshToken);
+  const newExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  // Token rotation — atomik: delete + create tek transaction'da
+  await prisma.$transaction(async (tx) => {
+    const stored = await tx.refreshToken.findUnique({ where: { tokenHash } });
+
+    if (!stored || stored.expiresAt < new Date()) {
+      throw new ApiError(401, 'UNAUTHORIZED', 'Geçersiz veya süresi dolmuş refresh token');
+    }
+
+    await tx.refreshToken.delete({ where: { tokenHash } });
+    await tx.refreshToken.create({
+      data: {
+        userId: payload.sub,
+        tokenHash: newTokenHash,
+        expiresAt: newExpiresAt,
+      },
+    });
+  });
+
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+}
+
+export async function logout(refreshToken: string): Promise<void> {
+  const tokenHash = hashToken(refreshToken);
+  await prisma.refreshToken.deleteMany({ where: { tokenHash } });
 }
 
 export async function forgotPassword(input: ForgotPasswordInput): Promise<{ message: string }> {
