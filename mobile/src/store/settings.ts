@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SettingsState {
   notificationsEnabled: boolean;
@@ -17,24 +19,32 @@ interface SettingsState {
   setLanguage: (lang: 'tr' | 'en') => void;
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
-  notificationsEnabled: true,
-  darkModeEnabled: false,
-  notifyActivitySuggestions: true,
-  notifyReminders: true,
-  notifyAppNews: false,
-  profilePhoto: null,
-  language: 'tr',
-  toggleNotifications: () =>
-    set((state) => ({ notificationsEnabled: !state.notificationsEnabled })),
-  toggleDarkMode: () =>
-    set((state) => ({ darkModeEnabled: !state.darkModeEnabled })),
-  toggleActivitySuggestions: () =>
-    set((state) => ({ notifyActivitySuggestions: !state.notifyActivitySuggestions })),
-  toggleReminders: () =>
-    set((state) => ({ notifyReminders: !state.notifyReminders })),
-  toggleAppNews: () =>
-    set((state) => ({ notifyAppNews: !state.notifyAppNews })),
-  setProfilePhoto: (uri) => set({ profilePhoto: uri }),
-  setLanguage: (lang) => set({ language: lang }),
-}));
+export const useSettingsStore = create<SettingsState>()(
+  persist(
+    (set) => ({
+      notificationsEnabled: true,
+      darkModeEnabled: false,
+      notifyActivitySuggestions: true,
+      notifyReminders: true,
+      notifyAppNews: false,
+      profilePhoto: null,
+      language: 'tr',
+      toggleNotifications: () =>
+        set((state) => ({ notificationsEnabled: !state.notificationsEnabled })),
+      toggleDarkMode: () =>
+        set((state) => ({ darkModeEnabled: !state.darkModeEnabled })),
+      toggleActivitySuggestions: () =>
+        set((state) => ({ notifyActivitySuggestions: !state.notifyActivitySuggestions })),
+      toggleReminders: () =>
+        set((state) => ({ notifyReminders: !state.notifyReminders })),
+      toggleAppNews: () =>
+        set((state) => ({ notifyAppNews: !state.notifyAppNews })),
+      setProfilePhoto: (uri) => set({ profilePhoto: uri }),
+      setLanguage: (lang) => set({ language: lang }),
+    }),
+    {
+      name: 'settings-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
