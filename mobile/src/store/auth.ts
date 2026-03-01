@@ -28,7 +28,7 @@ interface AuthState {
 
   setUserProfilePhoto: (url: string) => void;
   updateUser: (fields: Partial<Pick<User, 'name' | 'city'>>) => void;
-
+  hydrate: () => Promise<void>;
 }
 
 
