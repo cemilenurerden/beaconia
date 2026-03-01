@@ -13,14 +13,16 @@ export const config = {
   
   // JWT
   jwtSecret: process.env.JWT_SECRET || 'default-secret-change-this',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret-change-this',
   
   // Resend (Email)
   resendApiKey: process.env.RESEND_API_KEY || '',
   emailFrom: process.env.EMAIL_FROM || 'Beaconia <noreply@beaconia.com>',
 
   // CORS
-  corsOrigin: process.env.CORS_ORIGIN || '*',
+  corsOrigin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+    : (process.env.NODE_ENV === 'production' ? [] : ['*']),
 
   // Cloudinary
   cloudinary: {

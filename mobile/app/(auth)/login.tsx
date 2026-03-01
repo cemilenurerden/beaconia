@@ -31,7 +31,7 @@ export default function LoginScreen() {
 
   const action = useCallback(async () => {
     const result = await api.post<AuthResult>('/auth/login', { email, password });
-    login(result.accessToken, result.user);
+    login(result.accessToken, result.refreshToken, result.user);
     router.replace('/(tabs)');
   }, [email, password, login, router]);
 

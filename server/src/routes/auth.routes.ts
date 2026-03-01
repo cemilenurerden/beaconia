@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
-import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema } from '../validators/auth.validator.js';
+import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema, refreshTokenSchema } from '../validators/auth.validator.js';
+import { loginRateLimit, registerRateLimit, forgotPasswordRateLimit } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -36,7 +37,7 @@ const router = Router();
  *       409:
  *         description: Email already registered
  */
-router.post('/register', validateBody(registerSchema), authController.register);
+router.post('/register', registerRateLimit, validateBody(registerSchema), authController.register);
 
 /**
  * @swagger
@@ -63,10 +64,12 @@ router.post('/register', validateBody(registerSchema), authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', validateBody(loginSchema), authController.login);
+router.post('/login', loginRateLimit, validateBody(loginSchema), authController.login);
 
-router.post('/forgot-password', validateBody(forgotPasswordSchema), authController.forgotPassword);
+router.post('/forgot-password', forgotPasswordRateLimit, validateBody(forgotPasswordSchema), authController.forgotPassword);
 router.post('/verify-reset-code', validateBody(verifyResetCodeSchema), authController.verifyResetCode);
 router.post('/reset-password', validateBody(resetPasswordSchema), authController.resetPassword);
+router.post('/refresh', validateBody(refreshTokenSchema), authController.refreshToken);
+router.post('/logout', authController.logout);
 
 export default router;

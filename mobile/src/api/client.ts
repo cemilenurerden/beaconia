@@ -6,6 +6,7 @@ const REQUEST_TIMEOUT = 45_000;
 
 class ApiClient {
   private baseURL: string;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
@@ -24,7 +25,39 @@ class ApiClient {
     return headers;
   }
 
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  // Eş zamanlı 401 isteklerinde sadece tek refresh çağrısı yapılır
+  private tryRefresh(): Promise<string | null> {
+    if (this.refreshPromise) return this.refreshPromise;
+    this.refreshPromise = this.doRefresh().finally(() => {
+      this.refreshPromise = null;
+    });
+    return this.refreshPromise;
+  }
+
+  private async doRefresh(): Promise<string | null> {
+    const { refreshToken, setTokens, logout } = useAuthStore.getState();
+    if (!refreshToken) return null;
+    try {
+      const res = await fetch(`${this.baseURL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) {
+        await logout();
+        return null;
+      }
+      const body = await res.json();
+      const { accessToken, refreshToken: newRefreshToken } = body.data;
+      setTokens(accessToken, newRefreshToken);
+      return accessToken;
+    } catch {
+      await logout();
+      return null;
+    }
+  }
+
+  async request<T>(endpoint: string, options: RequestInit = {}, isRetry = false): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
     const controller = new AbortController();
@@ -52,6 +85,15 @@ class ApiClient {
       throw new ApiError('Sunucuya bağlanılamadı.', 'NETWORK_ERROR', 0);
     } finally {
       clearTimeout(timeout);
+    }
+
+    // 401 → token refresh dene, bir kez tekrar et
+    if (response.status === 401 && !isRetry) {
+      const newToken = await this.tryRefresh();
+      if (newToken) {
+        return this.request<T>(endpoint, options, true);
+      }
+      throw new ApiError('Oturum süresi doldu. Lütfen tekrar giriş yapın.', 'UNAUTHORIZED', 401);
     }
 
     let body: any;

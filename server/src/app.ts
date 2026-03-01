@@ -10,7 +10,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: config.corsOrigin,
+  origin: (origin, callback) => {
+    // React Native native HTTP isteklerinde Origin header gelmez → izin ver
+    if (!origin) return callback(null, true);
+    const allowed = Array.isArray(config.corsOrigin) ? config.corsOrigin : [config.corsOrigin];
+    if (allowed.includes('*') || allowed.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: ${origin} izin verilmiyor`));
+  },
   credentials: true,
 }));
 

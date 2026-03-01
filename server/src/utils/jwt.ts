@@ -7,19 +7,27 @@ export interface JwtPayload {
   exp?: number;
 }
 
-export function generateToken(userId: string): string {
-  const token = jwt.sign(
-    { sub: userId },
-    config.jwtSecret,
-    { expiresIn: '7d' }
-  );
-  return token;
+
+export function generateAccessToken(userId: string): string {
+  return jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: '15m' });
+}
+
+export function generateRefreshToken(userId: string): string {
+  return jwt.sign({ sub: userId }, config.jwtRefreshSecret, { expiresIn: '30d' });
+
 }
 
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload;
-    return decoded;
+    return jwt.verify(token, config.jwtSecret) as JwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+export function verifyRefreshToken(token: string): JwtPayload | null {
+  try {
+    return jwt.verify(token, config.jwtRefreshSecret) as JwtPayload;
   } catch {
     return null;
   }
