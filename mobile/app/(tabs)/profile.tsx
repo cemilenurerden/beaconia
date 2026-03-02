@@ -1,4 +1,5 @@
 import { View, Text, Pressable, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
+import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +11,93 @@ import { useSettingsStore } from '../../src/store/settings';
 import { api } from '../../src/api/client';
 import { KendiniTaniSection } from '../../src/components/profile/KendiniTaniSection';
 import { moodToEmoji } from '../../src/utils/mappers';
+
+import type { MoodEntry } from '../../src/types';
+
+function formatMoodDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function MoodHistory({ moods, isDark }: { moods: (MoodEntry | string)[]; isDark: boolean }) {
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+
+  // Eski format (string[]) veya yeni format (MoodEntry[]) her ikisini de destekle
+  const normalized: MoodEntry[] = moods.map((m) =>
+    typeof m === 'string' ? { mood: m, dates: [] } : m
+  );
+
+  const handlePress = (mood: string) => {
+    setSelectedMood((prev) => (prev === mood ? null : mood));
+  };
+
+  if (normalized.length === 0) {
+    return (
+      <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+        <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>Mod Geçmişi</Text>
+        <Text className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-400'} text-center py-2`}>Henüz mod verisi yok</Text>
+      </View>
+    );
+  }
+
+  const selected = normalized.find((m) => m.mood === selectedMood);
+  const selectedDates = selected?.dates ?? [];
+
+  return (
+    <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+      <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-1`}>Mod Geçmişi</Text>
+      <Text className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'} mb-3`}>Eskiden yeniye · Modlara bas tarihleri gör</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingVertical: 4 }}>
+        {normalized.map((item, i) => {
+          const isSelected = selectedMood === item.mood;
+          const dates = item.dates ?? [];
+          return (
+            <Pressable
+              key={`${item.mood}-${i}`}
+              onPress={() => handlePress(item.mood)}
+              style={{ alignItems: 'center', width: 52 }}
+            >
+              <View style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: isSelected ? '#4F46E5' : (isDark ? '#1E293B' : '#EEF2FF'),
+                borderWidth: isSelected ? 2 : 0,
+                borderColor: '#818CF8',
+              }}>
+                <Text style={{ fontSize: 22 }}>{moodToEmoji(item.mood)}</Text>
+              </View>
+              {dates.length > 0 && (
+                <Text style={{ fontSize: 10, color: isDark ? '#64748B' : '#9CA3AF', marginTop: 4 }}>
+                  {dates.length}x
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+      {selected && selectedDates.length > 0 && (
+        <View style={{
+          marginTop: 12,
+          padding: 12,
+          borderRadius: 12,
+          backgroundColor: isDark ? '#1E293B' : '#EEF2FF',
+        }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: isDark ? '#C7D2FE' : '#4F46E5', marginBottom: 6 }}>
+            {moodToEmoji(selected.mood)} seçildiği tarihler ({selectedDates.length}x)
+          </Text>
+          {selectedDates.map((date, i) => (
+            <Text key={i} style={{ fontSize: 12, color: isDark ? '#94A3B8' : '#6B7280', lineHeight: 20 }}>
+              · {formatMoodDate(date)}
+            </Text>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   Fitness: '#4F46E5',
@@ -192,23 +280,7 @@ export default function ProfileScreen() {
             <KendiniTaniSection insights={insights} isDark={isDark} />
 
             {/* Mod Gecmisi */}
-            <View className={`mx-4 mb-4 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl p-4`} style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
-              <Text className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-3`}>Mod Gecmisi</Text>
-              {analysis.topMoods.length > 0 ? (
-                <View className="flex-row justify-center gap-3">
-                  {analysis.topMoods.map((mood, i) => (
-                    <View
-                      key={i}
-                      className="w-12 h-12 rounded-full bg-indigo-50 items-center justify-center"
-                    >
-                      <Text className="text-xl">{moodToEmoji(mood)}</Text>
-                    </View>
-                  ))}
-                </View>
-              ) : (
-                <Text className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-400'} text-center py-2`}>Henuz mod verisi yok</Text>
-              )}
-            </View>
+            <MoodHistory moods={analysis.topMoods} isDark={isDark} />
 
             {/* Istatistik Kartlari - 2x2 Grid */}
             <View className="mx-4 mb-4">

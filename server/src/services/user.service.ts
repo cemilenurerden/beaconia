@@ -100,7 +100,7 @@ export interface ProfileAnalysis {
   topEnergy: string;
   topLocation: string;
   topSocial: string;
-  topMoods: string[];
+  topMoods: { mood: string; dates: string[] }[];
 }
 
 export async function getProfileAnalysis(userId: string): Promise<ProfileAnalysis> {
@@ -132,14 +132,18 @@ export async function getProfileAnalysis(userId: string): Promise<ProfileAnalysi
   const energyCounts: Record<string, number> = {};
   const locationCounts: Record<string, number> = {};
   const socialCounts: Record<string, number> = {};
-  const moodCounts: Record<string, number> = {};
+  const moodDates: Record<string, string[]> = {};
 
-  decisions.forEach((d) => {
+  // decisions desc sıralı geldi, kronoloji için ters çevir (eski → yeni)
+  [...decisions].reverse().forEach((d) => {
     const input = d.inputJson as any;
     if (input?.energy) energyCounts[input.energy] = (energyCounts[input.energy] || 0) + 1;
     if (input?.location) locationCounts[input.location] = (locationCounts[input.location] || 0) + 1;
     if (input?.social) socialCounts[input.social] = (socialCounts[input.social] || 0) + 1;
-    if (input?.mood) moodCounts[input.mood] = (moodCounts[input.mood] || 0) + 1;
+    if (input?.mood) {
+      if (!moodDates[input.mood]) moodDates[input.mood] = [];
+      moodDates[input.mood].push(d.createdAt.toISOString());
+    }
   });
 
   const topOf = (counts: Record<string, number>) =>
@@ -153,11 +157,10 @@ export async function getProfileAnalysis(userId: string): Promise<ProfileAnalysi
   const topLocation = locationMap[topOf(locationCounts)] || 'Farketmez';
   const topSocial = socialMap[topOf(socialCounts)] || 'Karışık';
 
-  // Top 5 moods
-  const topMoods = Object.entries(moodCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([mood]) => mood);
+  // Mood geçmişi — ilk kullanım tarihine göre kronolojik sıra (sol = eski, sağ = yeni)
+  const topMoods = Object.entries(moodDates)
+    .sort((a, b) => a[1][0].localeCompare(b[1][0]))
+    .map(([mood, dates]) => ({ mood, dates }));
 
   // Favorite activity from Favorite table
   const favorites = await prisma.favorite.findMany({

@@ -4,10 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { Ionicons } from '@expo/vector-icons';
 import { useHistory } from '../../src/hooks/useHistory';
+import { useWeeklyAnalysis } from '../../src/hooks/useWeeklyAnalysis';
 import TabSwitcher from '../../src/components/history/TabSwitcher';
 import ActivityCard from '../../src/components/history/ActivityCard';
 import FavoriteCard from '../../src/components/history/FavoriteCard';
 import WeeklySummary from '../../src/components/history/WeeklySummary';
+import WeeklyAnalysisModal from '../../src/components/history/WeeklyAnalysisModal';
 import EmptyState from '../../src/components/history/EmptyState';
 
 const TABS = [
@@ -17,7 +19,9 @@ const TABS = [
 
 export default function HistoryScreen() {
   const [activeTab, setActiveTab] = useState('history');
+  const [showAnalysis, setShowAnalysis] = useState(false);
   const { decisions, favorites, loading, sections, handleRemoveFavorite } = useHistory();
+  const weeklyAnalysis = useWeeklyAnalysis(decisions);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -59,7 +63,7 @@ export default function HistoryScreen() {
               </Text>
             )}
             renderItem={({ item }) => <ActivityCard decision={item} />}
-            ListFooterComponent={<WeeklySummary totalActivities={decisions.length} />}
+            ListFooterComponent={<WeeklySummary totalActivities={decisions.length} onPress={() => setShowAnalysis(true)} />}
           />
         )
       ) : (
@@ -77,6 +81,12 @@ export default function HistoryScreen() {
           />
         )
       )}
+      <WeeklyAnalysisModal
+        visible={showAnalysis}
+        onClose={() => setShowAnalysis(false)}
+        analysis={weeklyAnalysis}
+        isDark={isDark}
+      />
     </SafeAreaView>
   );
 }

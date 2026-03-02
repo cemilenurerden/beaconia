@@ -59,6 +59,11 @@ export interface UserPreferences {
 }
 
 // ---- Profile Analysis ----
+export interface MoodEntry {
+  mood: string;
+  dates: string[];
+}
+
 export interface ProfileAnalysis {
   totalActivities: number;
   longestStreak: number;
@@ -68,7 +73,7 @@ export interface ProfileAnalysis {
   topEnergy: string;
   topLocation: string;
   topSocial: string;
-  topMoods: string[];
+  topMoods: MoodEntry[];
 }
 
 // ---- Recommend ----
