@@ -3,6 +3,7 @@ import * as recommendController from '../controllers/recommend.controller.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
 import { optionalAuthMiddleware } from '../middlewares/auth.middleware.js';
 import { recommendSchema } from '../validators/recommend.validator.js';
+import { recommendRateLimit } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -48,6 +49,7 @@ const router = Router();
  */
 router.post(
   '/',
+  recommendRateLimit,
   optionalAuthMiddleware as unknown as RequestHandler,
   validateBody(recommendSchema),
   recommendController.recommend as unknown as RequestHandler

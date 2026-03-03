@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as activitiesController from '../controllers/activities.controller.js';
 import { validateQuery } from '../middlewares/validate.middleware.js';
 import { filterActivitiesSchema } from '../validators/activities.validator.js';
+import { activitiesRateLimit } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -55,6 +56,6 @@ const router = Router();
  *       200:
  *         description: List of activities
  */
-router.get('/', validateQuery(filterActivitiesSchema), activitiesController.findAll);
+router.get('/', activitiesRateLimit, validateQuery(filterActivitiesSchema), activitiesController.findAll);
 
 export default router;

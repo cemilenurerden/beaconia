@@ -100,6 +100,7 @@ model PasswordReset {
   codeHash  String
   expiresAt DateTime
   verified  Boolean  @default(false)
+  attempts  Int      @default(0)
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -111,6 +112,7 @@ model EmailVerification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   codeHash  String
   expiresAt DateTime
+  attempts  Int      @default(0)
   createdAt DateTime @default(now())
 
   @@index([userId])

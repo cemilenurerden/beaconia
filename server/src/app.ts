@@ -8,6 +8,10 @@ import { errorMiddleware } from './middlewares/error.middleware.js';
 
 const app = express();
 
+// Reverse proxy (nginx, Cloudflare, AWS ALB vb.) arkasında çalışırken
+// req.ip'nin doğru client IP'yi göstermesi için gerekli.
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
