@@ -227,17 +227,29 @@ export async function verifyResetCode(input: VerifyResetCodeInput): Promise<{ me
     throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
   }
 
-  const codeHash = crypto.createHash('sha256').update(input.code).digest('hex');
-
   const resetRecord = await prisma.passwordReset.findFirst({
     where: {
       userId: user.id,
-      codeHash,
       expiresAt: { gt: new Date() },
     },
   });
 
   if (!resetRecord) {
+    throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
+  }
+
+  if (resetRecord.attempts >= 5) {
+    await prisma.passwordReset.delete({ where: { id: resetRecord.id } });
+    throw new ApiError(400, 'MAX_ATTEMPTS', 'Çok fazla yanlış deneme. Lütfen yeni bir kod talep edin.');
+  }
+
+  const codeHash = crypto.createHash('sha256').update(input.code).digest('hex');
+
+  if (resetRecord.codeHash !== codeHash) {
+    await prisma.passwordReset.update({
+      where: { id: resetRecord.id },
+      data: { attempts: { increment: 1 } },
+    });
     throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
   }
 
@@ -262,17 +274,29 @@ export async function verifyEmail(input: VerifyEmailInput): Promise<AuthResult> 
     throw new ApiError(400, 'ALREADY_VERIFIED', 'Email zaten doğrulanmış');
   }
 
-  const codeHash = crypto.createHash('sha256').update(input.code).digest('hex');
-
   const verificationRecord = await prisma.emailVerification.findFirst({
     where: {
       userId: user.id,
-      codeHash,
       expiresAt: { gt: new Date() },
     },
   });
 
   if (!verificationRecord) {
+    throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
+  }
+
+  if (verificationRecord.attempts >= 5) {
+    await prisma.emailVerification.delete({ where: { id: verificationRecord.id } });
+    throw new ApiError(400, 'MAX_ATTEMPTS', 'Çok fazla yanlış deneme. Lütfen yeni bir kod talep edin.');
+  }
+
+  const codeHash = crypto.createHash('sha256').update(input.code).digest('hex');
+
+  if (verificationRecord.codeHash !== codeHash) {
+    await prisma.emailVerification.update({
+      where: { id: verificationRecord.id },
+      data: { attempts: { increment: 1 } },
+    });
     throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
   }
 

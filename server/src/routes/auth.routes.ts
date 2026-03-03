@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
 import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema, refreshTokenSchema, verifyEmailSchema, resendVerificationSchema } from '../validators/auth.validator.js';
-import { loginRateLimit, registerRateLimit, forgotPasswordRateLimit, verifyEmailRateLimit, resendVerificationRateLimit } from '../middlewares/rateLimit.middleware.js';
+import { loginRateLimit, registerRateLimit, forgotPasswordRateLimit, verifyEmailRateLimit, resendVerificationRateLimit, verifyResetCodeRateLimit, resetPasswordRateLimit, refreshRateLimit } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -67,9 +67,9 @@ router.post('/register', registerRateLimit, validateBody(registerSchema), authCo
 router.post('/login', loginRateLimit, validateBody(loginSchema), authController.login);
 
 router.post('/forgot-password', forgotPasswordRateLimit, validateBody(forgotPasswordSchema), authController.forgotPassword);
-router.post('/verify-reset-code', validateBody(verifyResetCodeSchema), authController.verifyResetCode);
-router.post('/reset-password', validateBody(resetPasswordSchema), authController.resetPassword);
-router.post('/refresh', validateBody(refreshTokenSchema), authController.refreshToken);
+router.post('/verify-reset-code', verifyResetCodeRateLimit, validateBody(verifyResetCodeSchema), authController.verifyResetCode);
+router.post('/reset-password', resetPasswordRateLimit, validateBody(resetPasswordSchema), authController.resetPassword);
+router.post('/refresh', refreshRateLimit, validateBody(refreshTokenSchema), authController.refreshToken);
 router.post('/logout', authController.logout);
 router.post('/verify-email', verifyEmailRateLimit, validateBody(verifyEmailSchema), authController.verifyEmail);
 router.post('/resend-verification', resendVerificationRateLimit, validateBody(resendVerificationSchema), authController.resendVerificationCode);
