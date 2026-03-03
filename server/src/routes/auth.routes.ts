@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
 import { validateBody } from '../middlewares/validate.middleware.js';
-import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema, refreshTokenSchema } from '../validators/auth.validator.js';
-import { loginRateLimit, registerRateLimit, forgotPasswordRateLimit } from '../middlewares/rateLimit.middleware.js';
+import { registerSchema, loginSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema, refreshTokenSchema, verifyEmailSchema, resendVerificationSchema } from '../validators/auth.validator.js';
+import { loginRateLimit, registerRateLimit, forgotPasswordRateLimit, verifyEmailRateLimit, resendVerificationRateLimit } from '../middlewares/rateLimit.middleware.js';
 
 const router = Router();
 
@@ -71,5 +71,7 @@ router.post('/verify-reset-code', validateBody(verifyResetCodeSchema), authContr
 router.post('/reset-password', validateBody(resetPasswordSchema), authController.resetPassword);
 router.post('/refresh', validateBody(refreshTokenSchema), authController.refreshToken);
 router.post('/logout', authController.logout);
+router.post('/verify-email', verifyEmailRateLimit, validateBody(verifyEmailSchema), authController.verifyEmail);
+router.post('/resend-verification', resendVerificationRateLimit, validateBody(resendVerificationSchema), authController.resendVerificationCode);
 
 export default router;

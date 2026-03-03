@@ -6,6 +6,7 @@ export default function Index() {
   const isHydrated = useAuthStore((s) => s.isHydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const hasSeenOnboarding = useAuthStore((s) => s.hasSeenOnboarding);
+  const user = useAuthStore((s) => s.user);
 
   if (!isHydrated) {
     return (
@@ -16,6 +17,9 @@ export default function Index() {
   }
 
   if (!hasSeenOnboarding) return <Redirect href="/onboarding" />;
+  if (isAuthenticated && user?.emailVerified === false) {
+    return <Redirect href={`/(auth)/verify-email?email=${encodeURIComponent(user?.email ?? '')}`} />;
+  }
   if (isAuthenticated) return <Redirect href="/(tabs)" />;
   return <Redirect href="/(auth)/login" />;
 }

@@ -6,7 +6,7 @@ import { AuthScreen } from '../../src/components/auth/AuthScreen';
 import { AuthInput } from '../../src/components/auth/AuthInput';
 import { AuthSubmitButton } from '../../src/components/auth/AuthSubmitButton';
 import { useAuthStore } from '../../src/store/auth';
-import { api } from '../../src/api/client';
+import { api, ApiError } from '../../src/api/client';
 import { useFormValidation } from '../../src/hooks/useFormValidation';
 import { useAuthSubmit } from '../../src/hooks/useAuthSubmit';
 import { required, email as emailRule, minLength, maxLength } from '../../src/utils/validation';
@@ -30,9 +30,17 @@ export default function LoginScreen() {
   const { errors, validateForm, clearFieldError } = useFormValidation(schema);
 
   const action = useCallback(async () => {
-    const result = await api.post<AuthResult>('/auth/login', { email, password });
-    login(result.accessToken, result.refreshToken, result.user);
-    router.replace('/(tabs)');
+    try {
+      const result = await api.post<AuthResult>('/auth/login', { email, password });
+      login(result.accessToken, result.refreshToken, result.user);
+      router.replace('/(tabs)');
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'EMAIL_NOT_VERIFIED') {
+        router.push(`/(auth)/verify-email?email=${encodeURIComponent(email)}`);
+        return;
+      }
+      throw e;
+    }
   }, [email, password, login, router]);
 
   const { loading, error, submit } = useAuthSubmit(action);

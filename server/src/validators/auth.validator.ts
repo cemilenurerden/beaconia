@@ -31,9 +31,20 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1),
 });
 
+export const verifyEmailSchema = z.object({
+  email: z.string().email('Geçerli bir email adresi giriniz'),
+  code: z.string().length(6, 'Kod 6 haneli olmalı'),
+});
+
+export const resendVerificationSchema = z.object({
+  email: z.string().email('Geçerli bir email adresi giriniz'),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type VerifyResetCodeInput = z.infer<typeof verifyResetCodeSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
