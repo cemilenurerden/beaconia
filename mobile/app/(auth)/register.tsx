@@ -35,7 +35,7 @@ export default function RegisterScreen() {
   const action = useCallback(async () => {
     const result = await api.post<AuthResult>('/auth/register', { name, email, password });
     login(result.accessToken, result.refreshToken, result.user);
-    router.replace('/(tabs)');
+    router.replace(`/(auth)/verify-email?email=${encodeURIComponent(email)}`);
   }, [name, email, password, login, router]);
 
   const { loading, error, submit } = useAuthSubmit(action);

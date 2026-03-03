@@ -87,8 +87,9 @@ class ApiClient {
       clearTimeout(timeout);
     }
 
-    // 401 → token refresh dene, bir kez tekrar et
-    if (response.status === 401 && !isRetry) {
+    // 401 → token refresh dene, bir kez tekrar et (auth endpoint'lerinde atla)
+    const isAuthEndpoint = endpoint.startsWith('/auth/');
+    if (response.status === 401 && !isRetry && !isAuthEndpoint) {
       const newToken = await this.tryRefresh();
       if (newToken) {
         return this.request<T>(endpoint, options, true);

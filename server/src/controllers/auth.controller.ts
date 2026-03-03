@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service.js';
 import { sendSuccess } from '../utils/response.js';
-import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput, RefreshTokenInput } from '../validators/auth.validator.js';
+import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput, RefreshTokenInput, VerifyEmailInput, ResendVerificationInput } from '../validators/auth.validator.js';
 
 export async function register(
   req: Request,
@@ -98,6 +98,34 @@ export async function logout(
       await authService.logout(refreshToken);
     }
     sendSuccess(res, { message: 'Çıkış yapıldı' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function verifyEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const input = req.body as VerifyEmailInput;
+    const result = await authService.verifyEmail(input);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function resendVerificationCode(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const input = req.body as ResendVerificationInput;
+    const result = await authService.resendVerificationCode(input);
+    sendSuccess(res, result);
   } catch (error) {
     next(error);
   }

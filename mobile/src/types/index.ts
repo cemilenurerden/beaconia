@@ -6,6 +6,7 @@ export interface User {
   city: string | null;
   profilePhoto: string | null;
   isPremium: boolean;
+  emailVerified: boolean;
   createdAt: string;
 }
 

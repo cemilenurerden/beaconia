@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import { prisma } from '../utils/prisma.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { ApiError } from '../types/index.js';
-import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput } from '../validators/auth.validator.js';
-import { sendPasswordResetCode } from './email.service.js';
+import { RegisterInput, LoginInput, ForgotPasswordInput, VerifyResetCodeInput, ResetPasswordInput, VerifyEmailInput, ResendVerificationInput } from '../validators/auth.validator.js';
+import { sendPasswordResetCode, sendEmailVerificationCode } from './email.service.js';
 
 export interface AuthResult {
   accessToken: string;
@@ -15,6 +15,7 @@ export interface AuthResult {
     email: string;
     city: string | null;
     profilePhoto: string | null;
+    emailVerified: boolean;
     createdAt: Date;
   };
 }
@@ -46,6 +47,26 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
     },
   });
 
+  // E-posta doğrulama kodu üret ve kaydet
+  const verificationCode = crypto.randomInt(100000, 999999).toString();
+  const verificationCodeHash = crypto.createHash('sha256').update(verificationCode).digest('hex');
+
+  await prisma.emailVerification.create({
+    data: {
+      userId: user.id,
+      codeHash: verificationCodeHash,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    },
+  });
+
+  // Email gönderimi başarısız olsa bile kayıt tamamlanır;
+  // kullanıcı verify-email ekranından "Tekrar Gönder" ile kod alabilir.
+  try {
+    await sendEmailVerificationCode({ email: user.email, code: verificationCode, name: user.name });
+  } catch (e) {
+    console.error('Kayıt email gönderilemedi:', e);
+  }
+
   const accessToken = generateAccessToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
 
@@ -66,6 +87,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
       email: user.email,
       city: user.city,
       profilePhoto: user.profilePhoto ?? null,
+      emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     },
   };
@@ -86,6 +108,10 @@ export async function login(input: LoginInput): Promise<AuthResult> {
 
   if (!isPasswordValid) {
     throw new ApiError(401, 'UNAUTHORIZED', 'Invalid credentials');
+  }
+
+  if (!user.emailVerified) {
+    throw new ApiError(403, 'EMAIL_NOT_VERIFIED', 'Email adresinizi doğrulamanız gerekiyor');
   }
 
   const accessToken = generateAccessToken(user.id);
@@ -114,6 +140,7 @@ export async function login(input: LoginInput): Promise<AuthResult> {
       email: user.email,
       city: user.city,
       profilePhoto: user.profilePhoto ?? null,
+      emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     },
   };
@@ -220,6 +247,103 @@ export async function verifyResetCode(input: VerifyResetCodeInput): Promise<{ me
   });
 
   return { message: 'Kod doğrulandı' };
+}
+
+export async function verifyEmail(input: VerifyEmailInput): Promise<AuthResult> {
+  const user = await prisma.user.findUnique({
+    where: { email: input.email },
+  });
+
+  if (!user) {
+    throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
+  }
+
+  if (user.emailVerified) {
+    throw new ApiError(400, 'ALREADY_VERIFIED', 'Email zaten doğrulanmış');
+  }
+
+  const codeHash = crypto.createHash('sha256').update(input.code).digest('hex');
+
+  const verificationRecord = await prisma.emailVerification.findFirst({
+    where: {
+      userId: user.id,
+      codeHash,
+      expiresAt: { gt: new Date() },
+    },
+  });
+
+  if (!verificationRecord) {
+    throw new ApiError(400, 'INVALID_CODE', 'Geçersiz veya süresi dolmuş kod');
+  }
+
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+    }),
+    prisma.emailVerification.deleteMany({
+      where: { userId: user.id },
+    }),
+    prisma.refreshToken.deleteMany({
+      where: { userId: user.id },
+    }),
+    prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(refreshToken),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      city: user.city,
+      profilePhoto: user.profilePhoto ?? null,
+      emailVerified: true,
+      createdAt: user.createdAt,
+    },
+  };
+}
+
+export async function resendVerificationCode(input: ResendVerificationInput): Promise<{ message: string }> {
+  const user = await prisma.user.findUnique({
+    where: { email: input.email },
+  });
+
+  // Email enumeration koruması
+  if (!user || user.emailVerified) {
+    return { message: 'Eğer bu email doğrulanmamış bir hesaba aitse, yeni kod gönderildi.' };
+  }
+
+  // Eski kodları sil
+  await prisma.emailVerification.deleteMany({
+    where: { userId: user.id },
+  });
+
+  // Yeni kod üret ve kaydet
+  const code = crypto.randomInt(100000, 999999).toString();
+  const codeHash = crypto.createHash('sha256').update(code).digest('hex');
+
+  await prisma.emailVerification.create({
+    data: {
+      userId: user.id,
+      codeHash,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    },
+  });
+
+  await sendEmailVerificationCode({ email: user.email, code, name: user.name });
+
+  return { message: 'Eğer bu email doğrulanmamış bir hesaba aitse, yeni kod gönderildi.' };
 }
 
 export async function resetPassword(input: ResetPasswordInput): Promise<{ message: string }> {
