@@ -30,7 +30,7 @@ router.use(authMiddleware as unknown as RequestHandler);
  *                 format: uuid
  *               feedback:
  *                 type: string
- *                 enum: [up, down, retry]
+ *                 enum: [up, down, retry, plan_b]
  *               reason:
  *                 type: string
  *     responses:

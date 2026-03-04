@@ -11,8 +11,8 @@ export const recommendSchema = z.object({
   location: locationEnum,
   cost: costEnum,
   social: socialEnum,
-  mood: z.string().optional(),
-  goal: z.string().optional(),
+  mood: z.string().max(100).optional(),
+  goal: z.string().max(200).optional(),
   excludeIds: z.array(z.string().uuid()).optional(),
   isRetry: z.boolean().optional(),
 });
