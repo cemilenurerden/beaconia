@@ -6,14 +6,14 @@ export const preferencesSchema = z.object({
   location: z.enum(['home', 'outdoor', 'any']),
   cost: z.enum(['free', 'low', 'medium']),
   social: z.enum(['solo', 'friends', 'both']),
-  mood: z.string().optional(),
+  mood: z.string().max(100).optional(),
 });
 
 export type PreferencesInput = z.infer<typeof preferencesSchema>;
 
 export const updateProfileSchema = z.object({
-  name: z.string().min(2, 'Ad en az 2 karakter olmalı').optional(),
-  city: z.string().min(2, 'Şehir en az 2 karakter olmalı').nullable().optional(),
+  name: z.string().min(2, 'Ad en az 2 karakter olmalı').max(100).optional(),
+  city: z.string().min(2, 'Şehir en az 2 karakter olmalı').max(100).nullable().optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

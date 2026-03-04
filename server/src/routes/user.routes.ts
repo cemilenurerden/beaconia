@@ -11,35 +11,11 @@ router.use(authMiddleware as unknown as RequestHandler);
 
 router.get('/stats', userController.getStats as unknown as RequestHandler);
 router.get('/preferences', userController.getPreferences as unknown as RequestHandler);
-router.put(
-  '/preferences',
-  validateBody(preferencesSchema),
-  userController.updatePreferences as unknown as RequestHandler
-);
+router.put('/preferences',validateBody(preferencesSchema),userController.updatePreferences as unknown as RequestHandler);
 router.get('/profile-analysis', userController.getProfileAnalysis as unknown as RequestHandler);
 router.get('/self-analysis', userController.getSelfAnalysis as unknown as RequestHandler);
-router.post(
-  '/profile-photo',
-  userController.upload.single('photo') as unknown as RequestHandler,
-  userController.uploadProfilePhoto as unknown as RequestHandler
-);
-
-router.put(
-  '/profile',
-  validateBody(updateProfileSchema),
-  userController.updateProfile as unknown as RequestHandler
-);
-router.put(
-  '/password',
-  validateBody(changePasswordSchema),
-  userController.changePassword as unknown as RequestHandler
-);
+router.post('/profile-photo',userController.upload.single('photo') as unknown as RequestHandler,userController.uploadProfilePhoto as unknown as RequestHandler);
+router.put('/profile',validateBody(updateProfileSchema),userController.updateProfile as unknown as RequestHandler);
+router.put('/password',validateBody(changePasswordSchema),userController.changePassword as unknown as RequestHandler);
 router.delete('/account', userController.deleteAccount as unknown as RequestHandler);
-router.post(
-  '/profile-photo',
-  userController.upload.single('photo') as unknown as RequestHandler,
-  userController.uploadProfilePhoto as unknown as RequestHandler
-);
-
-
 export default router;

@@ -89,6 +89,15 @@ async function calculateStreak(userId: string): Promise<number> {
   return streak;
 }
 
+// ---- Shared helpers ----
+
+const topOf = (counts: Record<string, number>): string =>
+  Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+
+const energyMap: Record<string, string> = { high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
+const locationMap: Record<string, string> = { outdoor: 'Dışarıda', home: 'Evde', any: 'Farketmez' };
+const socialMap: Record<string, string> = { solo: 'Tek başına', friends: 'Arkadaşlarla', both: 'Karışık' };
+
 // ---- Profile Analysis ----
 
 export interface ProfileAnalysis {
@@ -145,13 +154,6 @@ export async function getProfileAnalysis(userId: string): Promise<ProfileAnalysi
       moodDates[input.mood].push(d.createdAt.toISOString());
     }
   });
-
-  const topOf = (counts: Record<string, number>) =>
-    Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
-
-  const energyMap: Record<string, string> = { high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
-  const locationMap: Record<string, string> = { outdoor: 'Dışarıda', home: 'Evde', any: 'Farketmez' };
-  const socialMap: Record<string, string> = { solo: 'Tek başına', friends: 'Arkadaşlarla', both: 'Karışık' };
 
   const topEnergy = energyMap[topOf(energyCounts)] || 'Orta';
   const topLocation = locationMap[topOf(locationCounts)] || 'Farketmez';
@@ -393,13 +395,6 @@ export async function getSelfAnalysis(userId: string): Promise<Insight[]> {
     if (input?.location) locationCounts[input.location] = (locationCounts[input.location] || 0) + 1;
     if (input?.social) socialCounts[input.social] = (socialCounts[input.social] || 0) + 1;
   });
-  const topOf = (counts: Record<string, number>) =>
-    Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
-
-  const energyMap: Record<string, string> = { high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
-  const locationMap: Record<string, string> = { outdoor: 'Dışarıda', home: 'Evde', any: 'Farketmez' };
-  const socialMap: Record<string, string> = { solo: 'Tek başına', friends: 'Arkadaşlarla', both: 'Karışık' };
-
   const aiInsights = await getSelfAnalysisInsights({
     totalDecisions: decisions.length,
     retryRatio,

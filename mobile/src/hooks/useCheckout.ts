@@ -27,8 +27,6 @@ export function useCheckout() {
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const isFormValid =
     cardHolder.trim().length >= 3 &&
     cardNumber.replace(/\s/g, '').length === 16 &&
@@ -47,18 +45,8 @@ export function useCheckout() {
     setCvv(t.replace(/\D/g, '').slice(0, 4));
   }
 
-  async function handlePayment() {
-    if (!isFormValid) return;
-    setLoading(true);
-    // TODO: Gerçek ödeme entegrasyonu (Stripe, iyzico vb.)
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert(
-        'Ödeme Başarılı!',
-        'Premium üyeliğin aktif edildi. Artık sınırsız yenileme yapabilirsin!',
-        [{ text: 'Harika!', onPress: () => router.dismissAll() }],
-      );
-    }, 2000);
+  function handlePayment() {
+    Alert.alert('Yakında', 'Ödeme entegrasyonu henüz aktif değil.');
   }
 
   return {
@@ -73,7 +61,6 @@ export function useCheckout() {
     handleExpiryChange,
     cvv,
     handleCvvChange,
-    loading,
     isFormValid,
     handlePayment,
   };

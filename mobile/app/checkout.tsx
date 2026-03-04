@@ -41,7 +41,7 @@ export default function CheckoutScreen() {
     cardNumber, handleCardNumberChange,
     expiry, handleExpiryChange,
     cvv, handleCvvChange,
-    loading, isFormValid, handlePayment,
+    isFormValid, handlePayment,
   } = useCheckout();
 
   return (
@@ -146,16 +146,16 @@ export default function CheckoutScreen() {
           {/* Ödeme Butonu */}
           <TouchableOpacity
             onPress={handlePayment}
-            disabled={!isFormValid || loading}
+            disabled={!isFormValid}
             activeOpacity={0.8}
             style={{
-              backgroundColor: isFormValid && !loading ? colors.purple : colors.slate700,
+              backgroundColor: isFormValid ? colors.purple : colors.slate700,
               borderRadius: 16, paddingVertical: 20,
               alignItems: 'center', justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: '700', color: isFormValid && !loading ? colors.white : colors.slate500 }}>
-              {loading ? 'Ödeme Yapılıyor...' : `${price} Öde`}
+            <Text style={{ fontSize: 18, fontWeight: '700', color: isFormValid ? colors.white : colors.slate500 }}>
+              {`${price} Öde`}
             </Text>
           </TouchableOpacity>
 
